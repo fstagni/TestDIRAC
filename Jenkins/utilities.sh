@@ -138,9 +138,9 @@ function findDatabases(){
 	#
 	if [ ! -z "$DBstoExclude" ]
 	then 
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
 	else
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
 	fi
 
 	echo found `wc -l databases`

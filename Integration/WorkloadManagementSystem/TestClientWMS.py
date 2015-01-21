@@ -32,15 +32,16 @@ parseCommandLine()
 
 from TestDIRAC.Utilities.utils import find_all
 
-from DIRAC.Interfaces.API.Job import Job
+from DIRAC import gConfig
+from DIRAC import gLogger
+from DIRAC.Core.Security.ProxyInfo import getProxyInfo
 from DIRAC.Core.DISET.RPCClient import RPCClient
+from DIRAC.Interfaces.API.Job import Job
 from DIRAC.WorkloadManagementSystem.Client.WMSClient import WMSClient
 from DIRAC.WorkloadManagementSystem.Client.JobMonitoringClient import JobMonitoringClient
 from DIRAC.WorkloadManagementSystem.Agent.JobCleaningAgent import JobCleaningAgent
 from DIRAC.WorkloadManagementSystem.DB.PilotAgentsDB import PilotAgentsDB
 from DIRAC.WorkloadManagementSystem.DB.TaskQueueDB import TaskQueueDB
-
-from DIRAC import gLogger
 
 def helloWorldJob():
   job = Job()
@@ -474,17 +475,39 @@ class Matcher ( TestWMSTestCase ):
   "Testing Matcher"
 
   def test_matcher( self ):
+
     # insert a proper DN to run the test
-    resourceDescription = {'OwnerGroup': 'prod', 'OwnerDN':'/C=ch/O=DIRAC/OU=DIRAC CI/CN=ciuser/emailAddress=lhcb-dirac-ci@cern.ch',
-                           'DIRACVersion': 'pippo', 'ReleaseVersion':'blabla', 'VirtualOrganization':'LHCB',
-                           'PilotInfoReportedFlag':'True', 'PilotBenchmark':'anotherPilot', 'LHCbPlatform':'CERTO',
-                           'Site':'DIRAC.Jenkins.org', 'CPUTime' : 86400 }
-    matcher = RPCClient( 'WorkloadManagement/Matcher' )
-    JobStateUpdate = RPCClient( 'WorkloadManagement/JobStateUpdate' )
+    resourceDescription = {'Architecture': 'x86_64-slc6',
+                           'CEQueue': 'jenkins-queue_not_important',
+                           'CPUNormalizationFactor': '9.5',
+                           'CPUScalingFactor': '9.5',
+                           'CPUTime': 1080000,
+                           'CPUTimeLeft': 5000,
+                           'DIRACVersion': 'v8r0p1',
+                           'FileCatalog': 'LcgFileCatalogCombined',
+                           'GridCE': 'jenkins.cern.ch',
+                           'GridMiddleware': 'DIRAC',
+                           'LHCbPlatform': 'x86_64-slc5-gcc43-opt',
+                           'LocalSE': ['CERN-SWTEST'],
+                           'MaxTotalJobs': 100,
+                           'MaxWaitingJobs': 10,
+                           'OutputURL': 'gsiftp://localhost',
+                           'PilotBenchmark': 9.5,
+                           'PilotReference': 'somePilotReference',
+                           'Platform': 'x86_64-slc6',
+                           'ReleaseProject': 'LHCb',
+                           'ReleaseVersion': 'v8r0p1',
+                           'Setup': gConfig.getValue( 'DIRAC/Setup' ),
+                           'Site': 'DIRAC.Jenkins.ch',
+                           'WaitingToRunningRatio': 0.05}
+#     {'OwnerGroup': 'prod', 'OwnerDN':'/C=ch/O=DIRAC/OU=DIRAC CI/CN=ciuser/emailAddress=lhcb-dirac-ci@cern.ch',
+#                            'DIRACVersion': 'pippo', 'ReleaseVersion':'blabla', 'VirtualOrganization':'LHCB',
+#                            'PilotInfoReportedFlag':'True', 'PilotBenchmark':'anotherPilot', 'LHCbPlatform':'CERTO',
+#                            'Site':'DIRAC.Jenkins.org', 'CPUTime' : 86400 }
     wmsClient = WMSClient()
 
     job = helloWorldJob()
-    job.setDestination( 'DIRAC.Jenkins.org' )
+    job.setDestination( 'DIRAC.Jenkins.ch' )
     job.setInputData( '/a/bbb' )
     job.setType( 'User' )
     jobDescription = createFile( job )
@@ -493,16 +516,21 @@ class Matcher ( TestWMSTestCase ):
 
     jobID = res['Value']
 
+    JobStateUpdate = RPCClient( 'WorkloadManagement/JobStateUpdate' )
     res = JobStateUpdate.setJobStatus( jobID, 'Waiting', 'matching', 'source' )
     self.assert_( res['OK'] )
 
 
     tqDB = TaskQueueDB()
-    tqDefDict = {'OwnerDN': '/C=ch/O=DIRAC/OU=DIRAC CI/CN=ciuser/emailAddress=lhcb-dirac-ci@cern.ch',
-                 'OwnerGroup':'prod', 'Setup':'DeveloperSetup', 'CPUTime':86400}
+
+    tqDefDict = {'OwnerDN': getProxyInfo()['Value']['identity'],
+                 'OwnerGroup':getProxyInfo()['Value']['group'],
+                 'Setup':gConfig.getValue( 'DIRAC/Setup' ),
+                 'CPUTime':86400}
     res = tqDB.insertJob( jobID, tqDefDict, 10 )
     self.assert_( res['OK'] )
 
+    matcher = RPCClient( 'WorkloadManagement/Matcher' )
     res = matcher.requestJob( resourceDescription )
     print res
     self.assert_( res['OK'] )
