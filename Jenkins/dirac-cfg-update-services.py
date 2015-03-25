@@ -14,22 +14,6 @@ Script.parseCommandLine()
 
 args = Script.getPositionalArgs()
 
-if len( args ) < 1:
-  Script.showHelp()
-  exit( -1 )
-
-setupName = args[0]
-
-import os.path
-
-from DIRAC.Core.Utilities.CFG import CFG
-
-localCfg = CFG()
-
-# Which file
-localConfigFile = os.path.join( '.', 'etc', 'Production.cfg' )
-localCfg.loadFromFile( localConfigFile )
-
 # Setup the DFC
 #
 # DataManagement
@@ -55,19 +39,19 @@ localCfg.loadFromFile( localConfigFile )
 #   }
 # }
 
+from DIRAC.ConfigurationSystem.Client.CSAPI import CSAPI
+csAPI = CSAPI()
 
 for sct in ['Systems/DataManagement/Production/Services',
             'Systems/DataManagement/Production/Services/FileCatalog' ]:
-  if not localCfg.existsKey( sct ):
-    try:
-      localCfg.createNewSection( sct )
-    except KeyError:
-      continue
+  res = csAPI.createSection( sct )
+  if not res['OK']:
+    print res['Message']
+    exit( 1 )
 
-localCfg.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/DirectoryManager', 'DirectoryClosure' )
-localCfg.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/FileManager', 'FileManagerPs' )
-localCfg.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/SecurityManager', 'DirectorySecurityManagerWithDelete' )
-localCfg.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/UniqueGUID', True )
+csAPI.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/DirectoryManager', 'DirectoryClosure' )
+csAPI.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/FileManager', 'FileManagerPs' )
+csAPI.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/SecurityManager', 'DirectorySecurityManagerWithDelete' )
+csAPI.setOption( 'Systems/DataManagement/Production/Services/FileCatalog/UniqueGUID', True )
 
-
-localCfg.writeToFile( localConfigFile )
+csAPI.commit()
