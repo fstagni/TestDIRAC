@@ -79,9 +79,7 @@ class ReqDB( ReqClientTestCase ):
     self.assertEqual( "Request" in tableDict, True )
     self.assertEqual( "Operation" in tableDict, True )
     self.assertEqual( "File" in tableDict, True )
-    self.assertEqual( tableDict["Request"], Request.tableDesc() )
-    self.assertEqual( tableDict["Operation"], Operation.tableDesc() )
-    self.assertEqual( tableDict["File"], File.tableDesc() )
+
 
     # # empty DB at that stage
     ret = RequestDB().getDBSummary()
@@ -221,7 +219,7 @@ class ReqClientMix( ReqClientTestCase ):
       op += File( { "LFN": "/lhcb/user/c/cibak/foo" } )
       request += op
       put = db.putRequest( request )
-      self.assertEqual( put["OK"], True, "put failed" )
+      self.assertEqual( put["OK"], True )
 
     loops = self.stressRequests // self.bulkRequest + ( 1 if ( self.stressRequests % self.bulkRequest ) else 0 )
     totalSuccessful = 0
