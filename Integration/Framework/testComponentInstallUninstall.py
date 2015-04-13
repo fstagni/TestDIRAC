@@ -7,6 +7,7 @@ This test assumes that the FTSDB database is not installed and doesn't exist in 
 """
 
 from DIRAC.Core.Base.Script import parseCommandLine
+from DIRAC.Core.Utilities.CFG import CFG
 parseCommandLine()
 
 import unittest
@@ -102,7 +103,7 @@ class ComponentInstallationChain( TestComponentInstallation ):
     # Check installation in CS
     self.csClient.downloadCSData()
     cfg = self.csClient.getCurrentCFG()[ 'Value' ]
-    self.assert_( 'Systems/DataManagement/' + self.frameworkSetup + '/Databases/FTSDB/' )
+    self.assert_( cfg.isSection( 'Systems/DataManagement/' + self.frameworkSetup + '/Databases/FTSDB/' ) )
 
     # Check in database
     result = self.monitoringClient.getInstallations( { 'Instance': 'FTSDB', 'UnInstallationTime': None },
