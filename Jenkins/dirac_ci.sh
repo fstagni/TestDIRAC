@@ -66,8 +66,9 @@ function installSite(){
 	sed -i s/VAR_DB_Host/$DB_HOST/g $WORKSPACE/DIRAC/install.cfg
 	sed -i s/VAR_DB_Port/$DB_PORT/g $WORKSPACE/DIRAC/install.cfg
 	
-	#Drop ComponentMonitoringDB if exists	
+	#Drop ComponentMonitoringDB and InstalledComponentsDB if exists	
 	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS ComponentMonitoringDB;"
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS InstalledComponentsDB;"
 	
 	#Installing
 	./install_site.sh install.cfg
