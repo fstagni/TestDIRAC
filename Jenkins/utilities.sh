@@ -431,7 +431,8 @@ function diracUserAndGroup(){
 	dirac-admin-add-user -N trialUser -D /C=ch/O=DIRAC/OU=DIRAC CI/CN=trialUser/emailAddress=trialUser@cern.ch -M trialUser@cern.ch -G user $DEBUG
 	
 	dirac-admin-add-group -G prod -U adminusername,ciuser,trialUser -P Operator,FullDelegation,ProxyManagement,ServiceAdministrator,JobAdministrator,CSAdministrator,AlarmsManagement,FileCatalogManagement,SiteManager,NormalUser $DEBUG
-
+	
+	dirac-admin-add-shifter DataManager adminusername prod
 }
 
 
