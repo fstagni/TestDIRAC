@@ -180,7 +180,8 @@ function DIRACPilotInstall(){
 
 	findRelease
  
-	python dirac-pilot.py -S LHCb-Certification -r $projectVersion -C dips://lbvobox18.cern.ch:9135/Configuration/Server -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ $DEBUG
+	#Don't launch the JobAgent here
+	python dirac-pilot.py -S LHCb-Certification -r $projectVersion -C dips://lbvobox18.cern.ch:9135/Configuration/Server -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ -X GetPilotVersion,CheckWorkerNode,InstallDIRAC,ConfigureBasics,ConfigureSite,ConfigureArchitecture,ConfigureCPURequirements $DEBUG
 }
 
 ############################################ 
