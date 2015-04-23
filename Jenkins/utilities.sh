@@ -498,7 +498,7 @@ diracServices(){
 	echo '[diracServices]'
 
 	#TODO: revise this list, try to add services
-	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v FTSManager | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap  | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap  | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
 	for serv in $services
 	do
 		echo 'calling dirac-install-service' $serv $DEBUG 
