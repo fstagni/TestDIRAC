@@ -88,16 +88,18 @@ function installSite(){
 function fullInstallDIRAC(){
 	echo '[fullInstallDIRAC]'
 	
-finalCleanup
+	finalCleanup
 
-if [ ! -z "$DEBUG" ]
-then
-	echo 'Running in DEBUG mode'
-	export DEBUG='-ddd'
-fi  
+	if [ ! -z "$DEBUG" ]
+	then
+		echo 'Running in DEBUG mode'
+		export DEBUG='-ddd'
+	fi  
 
-	#basic install, with only the CS running 
+	#basic install, with only the CS (and ComponentMonitoring) running, together with DBs InstalledComponentsDB and ComponentMonitoringDB) 
 	installSite
+	#do basic tests
+	python $WORKSPACE/TestDIRAC/Integration/Framework/testComponentInstallUninstall.py -dd
 
 	#replace the sources with custom ones if defined
 	diracReplace
