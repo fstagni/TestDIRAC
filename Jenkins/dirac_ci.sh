@@ -186,6 +186,12 @@ function DIRACPilotInstall(){
 
 function fullPilot(){
 	
+	if [ ! -z "$DEBUG" ]
+	then
+		echo 'Running in DEBUG mode'
+		export DEBUG='-ddd'
+	fi  
+
 	#first simply install via the pilot
 	DIRACPilotInstall
 
