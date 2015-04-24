@@ -176,38 +176,21 @@ function DIRACPilotInstall(){
 	prepareForPilot
 	
 	#run the dirac-pilot script, the JobAgent won't necessarily match a job
-	#FIXME: using LHCb-Certification here, and LHCb CS! 
 
 	findRelease
  
 	#Don't launch the JobAgent here
-	python dirac-pilot.py -S LHCb-Certification -r $projectVersion -C dips://lbvobox18.cern.ch:9135/Configuration/Server -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ -X GetPilotVersion,CheckWorkerNode,InstallDIRAC,ConfigureBasics,ConfigureSite,ConfigureArchitecture,ConfigureCPURequirements $DEBUG
+	python dirac-pilot.py -S $DIRACSETUP -r $projectVersion -C $CSURL -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ -X GetPilotVersion,CheckWorkerNode,InstallDIRAC,ConfigureBasics,ConfigureSite,ConfigureArchitecture,ConfigureCPURequirements $DEBUG
 }
 
-############################################ 
-# Utilities
 
-
-function getCertificate(){
-	echo '[getCertificate]'
-	# just gets a host certificate from a known location 
+function fullPilot(){
 	
-	mkdir -p $WORKSPACE/etc/grid-security/
-	cp /root/hostcert.pem $WORKSPACE/etc/grid-security/
-	cp /root/hostkey.pem $WORKSPACE/etc/grid-security/ 
-	chmod 0600 $WORKSPACE/etc/grid-security/hostkey.pem
+	#first simply install via the pilot
+	DIRACPilotInstall
 
-} 
-
-function prepareForPilot(){
-	
-	#cert first (host certificate)
-	#getCertificate (no need...)
-	
-	#get the necessary scripts
-	wget --no-check-certificate -O dirac-install.py $DIRAC_INSTALL
-	wget --no-check-certificate -O dirac-pilot.py $DIRAC_PILOT
-	wget --no-check-certificate -O pilotTools.py $DIRAC_PILOT_TOOLS
-	wget --no-check-certificate -O pilotCommands.py $DIRAC_PILOT_COMMANDS
-
+	#Getting a user proxy, so that we can run jobs
+	downloadProxy
+	#Set not to use the server certificate for running the jobs 
+	dirac-configure -FDMH -o /DIRAC/Security/UseServerCertificate=False $DEBUG
 }

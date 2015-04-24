@@ -562,8 +562,8 @@ dropDBs(){
   #
   #.............................................................................
 
-  function killRunsv(){
-    echo '[killRunsv]'
+function killRunsv(){
+	echo '[killRunsv]'
 
     # Bear in mind that we run with 'errexit' mode. This call, if finds nothing
     # will return an error, which will make the whole script exit. However, if 
@@ -623,7 +623,7 @@ dropDBs(){
   #
   #.............................................................................
 
-  function startRunsv(){
+function startRunsv(){
     echo '[startRunsv]'
     
     # Let's try to be a bit more delicated than the function above
@@ -640,5 +640,50 @@ dropDBs(){
     
     runsvstat $WORKSPACE/startup/*
    
-  }
+}
 
+
+
+
+############################################ 
+# Pilot tests Utilities
+
+
+function getCertificate(){
+	echo '[getCertificate]'
+	# just gets a host certificate from a known location 
+	
+	mkdir -p $WORKSPACE/etc/grid-security/
+	cp /root/hostcert.pem $WORKSPACE/etc/grid-security/
+	cp /root/hostkey.pem $WORKSPACE/etc/grid-security/ 
+	chmod 0600 $WORKSPACE/etc/grid-security/hostkey.pem
+
+} 
+
+function prepareForPilot(){
+	
+	#cert first (host certificate)
+	#getCertificate (no need...)
+	
+	#get the necessary scripts
+	wget --no-check-certificate -O dirac-install.py $DIRAC_INSTALL
+	wget --no-check-certificate -O dirac-pilot.py $DIRAC_PILOT
+	wget --no-check-certificate -O pilotTools.py $DIRAC_PILOT_TOOLS
+	wget --no-check-certificate -O pilotCommands.py $DIRAC_PILOT_COMMANDS
+
+}
+
+
+#.............................................................................
+#
+# downloadProxy:
+#
+#   dowloads a proxy from the ProxyManager (a real one - which is probably the certification one) into a file
+#
+#.............................................................................
+
+function downloadProxy(){
+	echo '[downloadProxy]'
+	
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-proxy-download.py $DIRACUSERDN $DIRACUSERROLE -o /DIRAC/Security/UseServerCertificate=True $PILOTCFG $DEBUG
+}
