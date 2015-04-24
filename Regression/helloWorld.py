@@ -1,8 +1,8 @@
 # dirac job created by ganga
-from LHCbDIRAC.Interfaces.API.LHCbJob import LHCbJob
-from LHCbDIRAC.Interfaces.API.DiracLHCb import DiracLHCb
-j = LHCbJob()
-dirac = DiracLHCb()
+from DIRAC.Interfaces.API.Job import Job
+from DIRAC.Interfaces.API.Dirac import Dirac
+j = Job()
+dirac = Dirac()
 
 # default commands added by ganga
 j.setName("helloWorld-test")
