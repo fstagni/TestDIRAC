@@ -23,10 +23,11 @@ from DIRAC.Core.Utilities.CFG import CFG
 
 localCfg = CFG()
 if cFile:
-  localCfg.loadFromFile( cFile )
+  localConfigFile = cFile
 else:
-  localCfg.loadFromFile( './etc/dirac.cfg' )
+  localConfigFile = './etc/dirac.cfg'
 
+localCfg.loadFromFile( localConfigFile )
 if not localCfg.isSection( '/LocalSite' ):
   localCfg.createNewSection( '/LocalSite' )
 localCfg.setOption( '/LocalSite/CPUTimeLeft', 5000 )
