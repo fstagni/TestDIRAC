@@ -201,8 +201,8 @@ function fullPilot(){
 	#Adding the LocalSE and the CPUTimeLeft, for the subsequent tests
 	dirac-configure -FDMH --UseServerCertificate -L $DIRACSE $DEBUG
 	
-	#Configure for CPUTimeLeft
-	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update.py -o /DIRAC/Security/UseServerCertificate=True $DEBUG
+	#Configure for CPUTimeLeft and more
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update.py -V $VO -S $DIRACSETUP -o /DIRAC/Security/UseServerCertificate=True $DEBUG
 	
 	#Getting a user proxy, so that we can run jobs
 	downloadProxy
