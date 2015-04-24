@@ -9,13 +9,18 @@ Script.setUsageMessage( '\n'.join( [ __doc__.split( '\n' )[1],
 Script.parseCommandLine()
 args = Script.getPositionalArgs()
 
+
 import os
 
 from DIRAC.Core.Utilities.CFG import CFG
 
 localCfg = CFG()
-localConfigFile = os.path.join( '.', args[0] )
-localCfg.loadFromFile( localConfigFile )
+if len( args ) == 1:
+  localConfigFile = os.path.join( '.', args[0] )
+  localCfg.loadFromFile( localConfigFile )
+else:
+  localCfg.loadFromFile( './etc/dirac.cfg' )
+
 if not localCfg.isSection( '/LocalSite' ):
   localCfg.createNewSection( '/LocalSite' )
 localCfg.setOption( '/LocalSite/CPUTimeLeft', 5000 )
