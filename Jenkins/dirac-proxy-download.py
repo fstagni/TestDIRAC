@@ -8,20 +8,25 @@ Script.setUsageMessage( '\n'.join( [ __doc__.split( '\n' )[1],
                                      'Usage:',
                                      '  %s [option|cfgFile] UserName Role' % Script.scriptName,
                                      'Arguments:',
-                                     '  UserName: User DN',
-                                     '  Role: User role'] ) )
-Script.parseCommandLine()
-args = Script.getPositionalArgs()
+                                     '  UserName: User DN'] ) )
 
-if len( args ) < 2:
-  Script.showHelp()
-  exit( -1 )
+Script.registerSwitch( 'D:', 'dn=', "set the User DN." )
+Script.registerSwitch( 'R:', 'role=', "set the User DN." )
+
+Script.parseCommandLine()
+
+for unprocSw in Script.getUnprocessedSwitches():
+  if unprocSw[0] in ( "R", "role" ):
+    role = unprocSw[1]
+
+args = Script.getPositionalArgs()
+dn = ' '.join( args )
 
 import os
 uid = os.getuid()
 from DIRAC.FrameworkSystem.Client.ProxyManagerClient        import gProxyManager
 
-res = gProxyManager.downloadProxyToFile( args[0], args[1],
+res = gProxyManager.downloadProxyToFile( dn, role,
                                          limited = False, requiredTimeLeft = 1200,
                                          cacheTime = 43200, filePath = '/tmp/x509up_u%s' % uid, proxyToConnect = False,
                                          token = False )

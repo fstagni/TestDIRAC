@@ -685,5 +685,5 @@ function prepareForPilot(){
 function downloadProxy(){
 	echo '[downloadProxy]'
 	
-	python $WORKSPACE/TestDIRAC/Jenkins/dirac-proxy-download.py '$DIRACUSERDN' '$DIRACUSERROLE' -o /DIRAC/Security/UseServerCertificate=True $PILOTCFG $DEBUG
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-proxy-download.py $DIRACUSERDN -R $DIRACUSERROLE -o /DIRAC/Security/UseServerCertificate=True $PILOTCFG $DEBUG
 }
