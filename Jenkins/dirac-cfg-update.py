@@ -5,19 +5,25 @@
 from DIRAC.Core.Base import Script
 Script.setUsageMessage( '\n'.join( [ __doc__.split( '\n' )[1],
                                      'Usage:',
-                                     '  %s [option|cfgFile] cfgFile' % Script.scriptName] ) )
+                                     '  %s [option|cfgFile]' % Script.scriptName] ) )
+
+Script.registerSwitch( 'F:', 'file=', "set the cfg file to update." )
+
 Script.parseCommandLine()
 args = Script.getPositionalArgs()
 
+cFile = ''
+for unprocSw in Script.getUnprocessedSwitches():
+  if unprocSw[0] in ( "F", "file" ):
+    cFile = unprocSw[1]
 
 import os
 
 from DIRAC.Core.Utilities.CFG import CFG
 
 localCfg = CFG()
-if len( args ) == 1:
-  localConfigFile = os.path.join( '.', args[0] )
-  localCfg.loadFromFile( localConfigFile )
+if cFile:
+  localCfg.loadFromFile( cFile )
 else:
   localCfg.loadFromFile( './etc/dirac.cfg' )
 
