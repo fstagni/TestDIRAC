@@ -10,7 +10,6 @@ Script.setUsageMessage( '\n'.join( [ __doc__.split( '\n' )[1],
                                      'Arguments:',
                                      '  UserName: User DN'] ) )
 
-Script.registerSwitch( 'D:', 'dn=', "set the User DN." )
 Script.registerSwitch( 'R:', 'role=', "set the User DN." )
 
 Script.parseCommandLine()
