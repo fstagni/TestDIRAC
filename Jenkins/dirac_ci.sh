@@ -189,6 +189,15 @@ function fullPilot(){
 	#first simply install via the pilot
 	DIRACPilotInstall
 
+	#this should have been created, we source it so that we can continue
+	source bashrc
+	
+	#Adding the LocalSE and the CPUTimeLeft, for the subsequent tests
+	dirac-configure -FDMH --UseServerCertificate -L $DIRACSE $DEBUG
+	
+	#Configure for CPUTimeLeft
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update.py -o /DIRAC/Security/UseServerCertificate=True $DEBUG
+	
 	#Getting a user proxy, so that we can run jobs
 	downloadProxy
 	#Set not to use the server certificate for running the jobs 
