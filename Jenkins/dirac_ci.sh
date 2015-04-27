@@ -66,10 +66,6 @@ function installSite(){
 	sed -i s/VAR_DB_Host/$DB_HOST/g $WORKSPACE/DIRAC/install.cfg
 	sed -i s/VAR_DB_Port/$DB_PORT/g $WORKSPACE/DIRAC/install.cfg
 	
-	#Drop ComponentMonitoringDB and InstalledComponentsDB if exists	
-	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS ComponentMonitoringDB;"
-	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS InstalledComponentsDB;"
-	
 	#Installing
 	./install_site.sh install.cfg
 	
@@ -96,10 +92,8 @@ function fullInstallDIRAC(){
 		export DEBUG='-ddd'
 	fi  
 
-	#basic install, with only the CS (and ComponentMonitoring) running, together with DBs InstalledComponentsDB and ComponentMonitoringDB) 
+	#basic install, with only the CS (and ComponentMonitoring) running, together with DB InstalledComponentsDB, which is needed) 
 	installSite
-	#do basic tests
-	python $WORKSPACE/TestDIRAC/Integration/Framework/testComponentInstallUninstall.py -dd
 
 	#replace the sources with custom ones if defined
 	diracReplace
