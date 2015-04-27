@@ -518,7 +518,7 @@ diracServices(){
 diracDBs(){
 	echo '[diracDBs]'
 
-	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB` | grep -v ^ComponentMonitoringDB` | grep -v ^InstalledComponentsDB`
+	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB | grep -v ^ComponentMonitoringDB | grep -v ^InstalledComponentsDB`
 	for db in $dbs
 	do
 		dirac-install-db $db $DEBUG

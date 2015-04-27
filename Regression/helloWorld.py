@@ -6,7 +6,7 @@ dirac = Dirac()
 
 # default commands added by ganga
 j.setName("helloWorld-test")
-j.setInputSandbox(['/afs/cern.ch/user/f/fstagni/userJobs/_inputHello.tgz', '/afs/cern.ch/user/f/fstagni/userJobs/hello-script.py'])
+j.setInputSandbox( ['/afs/cern.ch/user/f/fstagni/userJobs/_inputHello.tar.bz2', '/afs/cern.ch/user/f/fstagni/userJobs/hello-script.py'] )
 
 j.setExecutable("exe-script.py","","Ganga_Executable.log")
 
