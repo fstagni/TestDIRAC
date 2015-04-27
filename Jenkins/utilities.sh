@@ -134,13 +134,15 @@ function findDatabases(){
 	#
 	# HACK ALERT:
 	#
-	#   We are avoiding TransferDB, which will be deprecated soon.. and FileCatalogWithFkAndPsDB for the moment which is installed in other ways
+	#   We are avoiding TransferDB, which will be deprecated soon.. 
+	#	and FileCatalogWithFkAndPsDB for the moment which is installed in other ways
+	#	and InstalledComponentsDB which is installed at the beginning
 	#
 	if [ ! -z "$DBstoExclude" ]
 	then 
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
 	else
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
 	fi
 
 	echo found `wc -l databases`
