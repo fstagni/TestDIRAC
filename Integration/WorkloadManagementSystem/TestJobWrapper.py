@@ -1,3 +1,6 @@
+""" JobWrapper test
+"""
+
 from DIRAC.Resources.Computing.ComputingElementFactory import ComputingElementFactory
 from DIRAC.WorkloadManagementSystem.Utilities.Utils import createJobWrapper
 from DIRAC.Core.Security.ProxyInfo import getProxyInfo
@@ -50,7 +53,8 @@ class JobWrapperSubmissionCase( JobWrapperTestCase ):
 #     res = computingElement.submitJob( wrapperFile, self.payloadProxy )
 #     self.assert_( res['OK'] )
 
-    res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, extraOptions = 'pilot.cfg', logLevel = 'DEBUG' )
+    # res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, extraOptions = 'pilot.cfg', logLevel = 'DEBUG' )
+    res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, logLevel = 'DEBUG' )
     self.assert_( res['OK'] )
     wrapperFile = res['Value']
 
