@@ -74,15 +74,6 @@ class ReqDB( ReqClientTestCase ):
 
   def test_db( self ):
 
-    """ table description """
-    tableDict = RequestDB.getTableMeta()
-    self.assertEqual( "Request" in tableDict, True )
-    self.assertEqual( "Operation" in tableDict, True )
-    self.assertEqual( "File" in tableDict, True )
-#     self.assertEqual( tableDict["Request"], Request.tableDesc() )
-#     self.assertEqual( tableDict["Operation"], Operation.tableDesc() )
-#     self.assertEqual( tableDict["File"], File.tableDesc() )
-
     # # empty DB at that stage
     ret = RequestDB().getDBSummary()
     self.assertEqual( ret,
