@@ -39,7 +39,6 @@ class JobWrapperSubmissionCase( JobWrapperTestCase ):
                  'CPUTime': '1000000',
                  'Executable': '$DIRACROOT/scripts/dirac-jobexec',
                  'Arguments': "helloWorld.xml -o LogLevel=DEBUG pilot.cfg",
-                 'ExtraOptions': 'pilot.cfg',
                  'InputSandbox': ['helloWorld.xml', 'exe-script.py']}
     resourceParams = {}
     optimizerParams = {}
@@ -57,6 +56,7 @@ class JobWrapperSubmissionCase( JobWrapperTestCase ):
 #     self.assert_( res['OK'] )
 
     if 'pilot.cfg' in os.listdir( '.' ):
+      jobParams.setdefault( 'ExtraOptions', 'pilot.cfg' )
       res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, extraOptions = 'pilot.cfg', logLevel = 'DEBUG' )
     else:
       res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, logLevel = 'DEBUG' )
