@@ -1,12 +1,15 @@
 """ JobWrapper test
 """
 
+import unittest
+import os
+
+from DIRAC import gLogger
+
 from DIRAC.Resources.Computing.ComputingElementFactory import ComputingElementFactory
 from DIRAC.WorkloadManagementSystem.Utilities.Utils import createJobWrapper
 from DIRAC.Core.Security.ProxyInfo import getProxyInfo
 
-from DIRAC import gLogger
-import unittest
 
 class JobWrapperTestCase( unittest.TestCase ):
   """ Base class for the jobWrapper test cases
@@ -53,8 +56,10 @@ class JobWrapperSubmissionCase( JobWrapperTestCase ):
 #     res = computingElement.submitJob( wrapperFile, self.payloadProxy )
 #     self.assert_( res['OK'] )
 
-    # res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, extraOptions = 'pilot.cfg', logLevel = 'DEBUG' )
-    res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, logLevel = 'DEBUG' )
+    if 'pilot.cfg' in os.listdir( '.' ):
+      res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, extraOptions = 'pilot.cfg', logLevel = 'DEBUG' )
+    else:
+      res = createJobWrapper( 2, jobParams, resourceParams, optimizerParams, logLevel = 'DEBUG' )
     self.assert_( res['OK'] )
     wrapperFile = res['Value']
 
