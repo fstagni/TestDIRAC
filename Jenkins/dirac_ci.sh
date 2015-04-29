@@ -157,6 +157,7 @@ function clean(){
 	#DBs
 	findDatabases
 	dropDBs
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS FileCatalogDB;"
 	
 	#clean all
 	finalCleanup
