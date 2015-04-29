@@ -150,7 +150,17 @@ function fullInstallDIRAC(){
 }
 
 
-
+function clean(){
+	#stopping services
+	stopRunsv
+	
+	#DBs
+	findDatabases
+	dropDBs
+	
+	#clean all
+	finalCleanup
+}
 
 ############################################
 # Pilot

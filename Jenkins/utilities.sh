@@ -307,9 +307,14 @@ function diracInstall(){
 
 	wget --no-check-certificate -O dirac-install $DIRAC_INSTALL
 	chmod +x dirac-install
-	./dirac-install -r `cat dirac.version` -t server $DEBUG
+	
+	diracInstallCommand
 }
 
+#This is what VOs may replace
+function diracInstallCommand(){
+	./dirac-install -r `cat dirac.version` -t server $DEBUG
+}
 
 
 
@@ -602,19 +607,18 @@ function killRunsv(){
   #
   #.............................................................................
 
-  function stopRunsv(){
-    echo '[stopRunsv]'
+function stopRunsv(){
+	echo '[stopRunsv]'
 
-    # Let's try to be a bit more delicated than the function above
+	# Let's try to be a bit more delicated than the function above
 
-    source $WORKSPACE/bashrc
-    runsvctrl d $WORKSPACE/startup/*
-    runsvstat $WORKSPACE/startup/*
-    
-    # If does not work, let's kill it.
-    killRunsv
-   
-  }
+	source $WORKSPACE/bashrc
+	runsvctrl d $WORKSPACE/startup/*
+	runsvstat $WORKSPACE/startup/*
+	
+	# If does not work, let's kill it.
+	killRunsv
+}
 
 
   #.............................................................................
