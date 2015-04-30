@@ -7,7 +7,6 @@ This test assumes that the FTSDB database is not installed and doesn't exist in 
 """
 
 from DIRAC.Core.Base.Script import parseCommandLine
-from DIRAC.Core.Utilities.CFG import CFG
 parseCommandLine()
 
 import unittest
@@ -92,7 +91,6 @@ class ComponentInstallationChain( TestComponentInstallation ):
     self.assert_( not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and not cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ) )
 
   def testDatabase( self ):
-    results = []
 
     setMySQLPasswords( self.rootPwd, self.diracPwd )
 
