@@ -128,7 +128,6 @@ function fullInstallDIRAC(){
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-dbs.py $WORKSPACE $DEBUG
 	
 	#services (not looking for FrameworkSystem already installed)
-	#findServices 'exclude' 'FrameworkSystem'
 	findServices 'exclude' 'FrameworkSystem'
 	diracServices
 
@@ -158,6 +157,7 @@ function clean(){
 	findDatabases
 	dropDBs
 	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS FileCatalogDB;"
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS InstalledComponentsDB;"
 	
 	#clean all
 	finalCleanup
