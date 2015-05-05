@@ -123,6 +123,9 @@ function fullInstallDIRAC(){
 	dropDBs
 	diracDBs
 
+	#upload proxies
+	diracProxies
+	
 	#fix the DBs (for the FileCatalog)
 	diracDFCDB
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-dbs.py $WORKSPACE $DEBUG
@@ -142,10 +145,6 @@ function fullInstallDIRAC(){
 
 	echo 'Restarting DataManagement FileCatalog'
 	dirac-restart-component DataManagement FileCatalog $DEBUG
-
-	#upload proxies
-	diracProxies
-	# prod
 }
 
 
