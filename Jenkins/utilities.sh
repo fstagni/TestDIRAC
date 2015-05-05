@@ -439,7 +439,7 @@ function diracUserAndGroup(){
 	
 	dirac-admin-add-group -G prod -U adminusername,ciuser,trialUser -P Operator,FullDelegation,ProxyManagement,ServiceAdministrator,JobAdministrator,CSAdministrator,AlarmsManagement,FileCatalogManagement,SiteManager,NormalUser $DEBUG
 	
-	dirac-admin-add-shifter DataManager adminusername prod
+	dirac-admin-add-shifter DataManager adminusername prod $DEBUG
 }
 
 
