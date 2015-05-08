@@ -134,13 +134,15 @@ function findDatabases(){
 	#
 	# HACK ALERT:
 	#
-	#   We are avoiding TransferDB, which will be deprecated soon.. and FileCatalogWithFkAndPsDB for the moment which is installed in other ways
+	#   We are avoiding TransferDB, which will be deprecated soon.. 
+	#	and FileCatalogWithFkAndPsDB for the moment which is installed in other ways
+	#	and InstalledComponentsDB which is installed at the beginning
 	#
 	if [ ! -z "$DBstoExclude" ]
 	then 
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
 	else
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
 	fi
 
 	echo found `wc -l databases`
@@ -305,9 +307,14 @@ function diracInstall(){
 
 	wget --no-check-certificate -O dirac-install $DIRAC_INSTALL
 	chmod +x dirac-install
-	./dirac-install -r `cat dirac.version` -t server $DEBUG
+	
+	diracInstallCommand
 }
 
+#This is what VOs may replace
+function diracInstallCommand(){
+	./dirac-install -r `cat dirac.version` -t server $DEBUG
+}
 
 
 
@@ -431,7 +438,8 @@ function diracUserAndGroup(){
 	dirac-admin-add-user -N trialUser -D /C=ch/O=DIRAC/OU=DIRAC CI/CN=trialUser/emailAddress=trialUser@cern.ch -M trialUser@cern.ch -G user $DEBUG
 	
 	dirac-admin-add-group -G prod -U adminusername,ciuser,trialUser -P Operator,FullDelegation,ProxyManagement,ServiceAdministrator,JobAdministrator,CSAdministrator,AlarmsManagement,FileCatalogManagement,SiteManager,NormalUser $DEBUG
-
+	
+	dirac-admin-add-shifter DataManager adminusername prod $DEBUG
 }
 
 
@@ -497,7 +505,7 @@ diracServices(){
 	echo '[diracServices]'
 
 	#TODO: revise this list, try to add services
-	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v FTSManager | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap  | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
 	for serv in $services
 	do
 		echo 'calling dirac-install-service' $serv $DEBUG 
@@ -515,9 +523,9 @@ diracServices(){
 #-------------------------------------------------------------------------------
 
 diracDBs(){
-	echo '[dumpDBs]'
+	echo '[diracDBs]'
 
-	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB`
+	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB | grep -v ^InstalledComponentsDB`
 	for db in $dbs
 	do
 		dirac-install-db $db $DEBUG
@@ -561,8 +569,8 @@ dropDBs(){
   #
   #.............................................................................
 
-  function killRunsv(){
-    echo '[killRunsv]'
+function killRunsv(){
+	echo '[killRunsv]'
 
     # Bear in mind that we run with 'errexit' mode. This call, if finds nothing
     # will return an error, which will make the whole script exit. However, if 
@@ -599,19 +607,18 @@ dropDBs(){
   #
   #.............................................................................
 
-  function stopRunsv(){
-    echo '[stopRunsv]'
+function stopRunsv(){
+	echo '[stopRunsv]'
 
-    # Let's try to be a bit more delicated than the function above
+	# Let's try to be a bit more delicated than the function above
 
-    source $WORKSPACE/bashrc
-    runsvctrl d $WORKSPACE/startup/*
-    runsvstat $WORKSPACE/startup/*
-    
-    # If does not work, let's kill it.
-    killRunsv
-   
-  }
+	source $WORKSPACE/bashrc
+	runsvctrl d $WORKSPACE/startup/*
+	runsvstat $WORKSPACE/startup/*
+	
+	# If does not work, let's kill it.
+	killRunsv
+}
 
 
   #.............................................................................
@@ -622,7 +629,7 @@ dropDBs(){
   #
   #.............................................................................
 
-  function startRunsv(){
+function startRunsv(){
     echo '[startRunsv]'
     
     # Let's try to be a bit more delicated than the function above
@@ -639,5 +646,50 @@ dropDBs(){
     
     runsvstat $WORKSPACE/startup/*
    
-  }
+}
 
+
+
+
+############################################ 
+# Pilot tests Utilities
+
+
+function getCertificate(){
+	echo '[getCertificate]'
+	# just gets a host certificate from a known location 
+	
+	mkdir -p $WORKSPACE/etc/grid-security/
+	cp /root/hostcert.pem $WORKSPACE/etc/grid-security/
+	cp /root/hostkey.pem $WORKSPACE/etc/grid-security/ 
+	chmod 0600 $WORKSPACE/etc/grid-security/hostkey.pem
+
+} 
+
+function prepareForPilot(){
+	
+	#cert first (host certificate)
+	#getCertificate (no need...)
+	
+	#get the necessary scripts
+	wget --no-check-certificate -O dirac-install.py $DIRAC_INSTALL
+	wget --no-check-certificate -O dirac-pilot.py $DIRAC_PILOT
+	wget --no-check-certificate -O pilotTools.py $DIRAC_PILOT_TOOLS
+	wget --no-check-certificate -O pilotCommands.py $DIRAC_PILOT_COMMANDS
+
+}
+
+
+#.............................................................................
+#
+# downloadProxy:
+#
+#   dowloads a proxy from the ProxyManager (a real one - which is probably the certification one) into a file
+#
+#.............................................................................
+
+function downloadProxy(){
+	echo '[downloadProxy]'
+	
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-proxy-download.py $DIRACUSERDN -R $DIRACUSERROLE -o /DIRAC/Security/UseServerCertificate=True $PILOTCFG $DEBUG
+}
