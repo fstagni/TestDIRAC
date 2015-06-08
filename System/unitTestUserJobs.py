@@ -1,3 +1,6 @@
+""" Collection of user jobs for testing purposes
+"""
+
 from DIRAC.Core.Base.Script import parseCommandLine
 parseCommandLine()
 
@@ -7,7 +10,7 @@ import time
 from DIRAC import gLogger
 from DIRAC.Core.Security.ProxyInfo import getProxyInfo
 
-from TestDIRAC.Utilities.testJobDefinition import *
+from TestDIRAC.Utilities.testJobDefinitions import helloWorld
 
 gLogger.setLevel( 'VERBOSE' )
 

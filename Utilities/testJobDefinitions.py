@@ -2,29 +2,33 @@
 """
 
 from TestDIRAC.Utilities.utils import find_all
+from DIRAC.Interfaces.API.Job import Job
+from DIRAC.Interfaces.API.Dirac import Dirac
 
+# parameters
 
-
-
-tier1s = ['LCG.CERN.ch', 'LCG.CNAF.it', 'LCG.GRIDKA.de', 'LCG.IN2P3.fr', 'LCG.NIKHEF.nl',
-          'LCG.PIC.es', 'LCG.RAL.uk', 'LCG.SARA.nl', 'LCG.RRCKI.ru']
 
 # Common functions
 
-def getJob():
-  from DIRAC.Interfaces.API.Job import Job
-  return Job()
+def getJob( jobClass = None ):
+  if not jobClass:
+    jobClass = Job
+  oJob = jobClass()
+  return oJob
 
-def getDIRAC():
-  from DIRAC.Interfaces.API.Dirac import Dirac
-  return Dirac()
+def getDIRAC( diracClass = None ):
+  if not diracClass:
+    diracClass = Dirac
+  oDirac = diracClass()
+  return oDirac
 
-def baseToAllJobs( jName ):
+
+def baseToAllJobs( jName, jobClass = None ):
 
   print "**********************************************************************************************************"
   print "\n Submitting job ", jName
 
-  J = getJob()
+  J = getJob( jobClass )
   J.setName( jName )
   J.setCPUTime( 17800 )
   return J
