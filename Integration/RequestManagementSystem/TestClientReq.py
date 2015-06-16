@@ -29,7 +29,7 @@ class ReqClientTestCase( unittest.TestCase ):
   def setUp( self ):
     """ test case set up """
 
-    gLogger.setLevel( 'DEBUG' )
+    gLogger.setLevel( 'INFO' )
 
     self.file = File()
     self.file.LFN = "/lhcb/user/c/cibak/testFile"
@@ -83,9 +83,10 @@ class ReqDB( ReqClientTestCase ):
 
 class ReqClientMix( ReqClientTestCase ):
 
-  def test_fullChain( self ):
+  def test01fullChain( self ):
     put = self.requestClient.putRequest( self.request )
     self.assert_( put['OK'] )
+
     self.assertEqual( type( put['Value'] ), long )
     reqID = put['Value']
 
