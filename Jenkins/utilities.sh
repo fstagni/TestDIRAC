@@ -26,7 +26,7 @@ function findRelease(){
 
 	cd $WORKSPACE
 
-    PRE='p[[:digit:]]*'
+	PRE='p[[:digit:]]*'
 
 	if [ ! -z "$DIRACBRANCH" ]
 	then
@@ -41,27 +41,26 @@ function findRelease(){
 	wget --no-check-certificate -O releases.cfg $DIRAC_RELEASES
 
 	# Match project ( DIRAC ) version from releases.cfg
+
 	# If I don't specify a DIRACBRANCH, it will get the latest "production" release
-    
     # First, try to find if we are on a production tag
 	if [ ! -z "$DIRACBRANCH" ]
 	then
-    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
-    	
-    else
-    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | head -1 | sed 's/ //g'`
-    fi
-    #    projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]r[[:digit:]]*$PRE | head -1 | sed 's/ //g'`
+		projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
+	else
+		projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | head -1 | sed 's/ //g'`
+	fi
+	# projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]r[[:digit:]]*$PRE | head -1 | sed 's/ //g'`
 	# In case there are no production tags for the branch, look for pre-releases in that branch
 	if [ ! "$projectVersion" ]
 	then
 		if [ ! -z "$DIRACBRANCH" ]
 		then
 			projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
-	    else
-	    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | head -1 | sed 's/ //g'`
-	    fi
-    fi
+		else
+			projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | head -1 | sed 's/ //g'`
+		fi
+	fi
 
 	projectVersionLine=`cat releases.cfg | grep -n $projectVersion | cut -d ':' -f 1 | head -1`
 	# start := line number after "{"  
@@ -78,9 +77,9 @@ function findRelease(){
 	cd $WORKSPACE
 	rm -r $tmp_dir
 
-    # PrintOuts
-    echo DIRAC:$projectVersion && echo $projectVersion > dirac.version
-    echo EXTERNALS:$externalsVersion && echo $externalsVersion > externals.version
+	# PrintOuts
+	echo DIRAC:$projectVersion && echo $projectVersion > dirac.version
+	echo EXTERNALS:$externalsVersion && echo $externalsVersion > externals.version
 
 }
 
@@ -93,7 +92,6 @@ function findRelease(){
 #   named systems.
 #
 #.............................................................................
-  
 function findSystems(){
 	echo '[findSystems]'
 
