@@ -206,6 +206,7 @@ class ReqClientMix( ReqClientTestCase ):
       request += op
       put = db.putRequest( request )
       self.assertEqual( put["OK"], True )
+      reqIDs.append( put['Value'] )
 
     loops = self.stressRequests // self.bulkRequest + ( 1 if ( self.stressRequests % self.bulkRequest ) else 0 )
     totalSuccessful = 0
