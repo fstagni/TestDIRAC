@@ -25,7 +25,7 @@ class TestComponentInstallation( unittest.TestCase ):
   """
 
   def setUp( self ):
-    self.host = 'sergiovm.cern.ch'
+    self.host = 'localhost'
     self.notificationPort = 9154
     self.rootPwd = ''
     self.csClient = CSAPI()
