@@ -5,7 +5,7 @@
 """
 
 import unittest
-
+import time
 
 
 from DIRAC.Core.Base.Script import parseCommandLine
@@ -22,6 +22,7 @@ testUser = 'atsareg'
 testGroup = 'dirac_user'
 testDir = '/vo.formation.idgrilles.fr/user/a/atsareg/testdir'
 parentDir = '/vo.formation.idgrilles.fr/user/a/atsareg'
+parentparentDir = '/vo.formation.idgrilles.fr/user/a'
 nonExistingDir = "/I/Dont/exist/dir"
 testFile = '/vo.formation.idgrilles.fr/user/a/atsareg/testdir/testfile'
 nonExistingFile = "/I/Dont/exist"
@@ -450,9 +451,10 @@ class DirectoryCase( DFCTestCase ):
 
 
     # Only admin can change path group
-    result = self.dfc.changePathOwner( {parentDir : "toto"} )
     resultG = self.dfc.changePathGroup( {parentDir : "toto"} )
     resultM = self.dfc.changePathMode( {parentDir : 0777} )
+    result = self.dfc.changePathOwner( {parentDir : "toto"} )
+
 
     result2 = self.dfc.getDirectoryMetadata( [parentDir, testDir] )
 
@@ -490,11 +492,13 @@ class DirectoryCase( DFCTestCase ):
       self.assertEqual( result2['Value'].get( 'Successful', {} ).get( testDir, {} ).get( 'OwnerGroup' ), proxyGroup, "testDir should not have changed %s" % result2 )
 
 
+    # for ROW_COUNT to be okay
+    time.sleep( 1 )
 
     # Only admin can change path group
     resultM = self.dfc.changePathMode( {parentDir : 0777}, True )
-    result = self.dfc.changePathOwner( {parentDir : "toto"}, True )
     resultG = self.dfc.changePathGroup( {parentDir : "toto"}, True )
+    result = self.dfc.changePathOwner( {parentDir : "toto"}, True )
 
     result2 = self.dfc.getDirectoryMetadata( [parentDir, testDir] )
     result3 = self.dfc.getFileMetadata( testFile )
