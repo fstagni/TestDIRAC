@@ -121,6 +121,9 @@ function fullInstallDIRAC(){
 	#create groups
 	diracUserAndGroup
 
+	echo 'Restarting Framework ProxyManager'
+	dirac-restart-component Framework ProxyManager $DEBUG
+
 	#Now all the rest	
 
 	#DBs (not looking for FrameworkSystem ones, already installed)
@@ -130,8 +133,6 @@ function fullInstallDIRAC(){
 	diracDBs
 
 	#upload proxies
-	echo 'Restarting Framework ProxyManager'
-	dirac-restart-component Framework ProxyManager $DEBUG
 	diracProxies
 	
 	#fix the DBs (for the FileCatalog)
