@@ -123,6 +123,9 @@ function fullInstallDIRAC(){
 
 	echo 'Restarting Framework ProxyManager'
 	dirac-restart-component Framework ProxyManager $DEBUG
+	
+	echo 'Restarting Framework ComponentMonitoring'
+	dirac-restart-component Framework ComponentMonitoring $DEBUG
 
 	#Now all the rest	
 
@@ -154,6 +157,12 @@ function fullInstallDIRAC(){
 
 	echo 'Restarting DataManagement FileCatalog'
 	dirac-restart-component DataManagement FileCatalog $DEBUG
+
+	#agents
+	findAgents
+	diracAgents
+
+
 }
 
 
