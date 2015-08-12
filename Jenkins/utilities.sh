@@ -138,9 +138,9 @@ function findDatabases(){
 	#
 	if [ ! -z "$DBstoExclude" ]
 	then 
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
 	else
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
 	fi
 
 	echo found `wc -l databases`
@@ -503,7 +503,7 @@ diracServices(){
 	echo '[diracServices]'
 
 	#TODO: revise this list, try to add services
-	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap  | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
 	
 	# group proxy, will be uploaded explicitly
 	#	echo 'getting/uploading proxy for prod'
