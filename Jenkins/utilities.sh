@@ -502,8 +502,8 @@ function diracAddSite(){
 diracServices(){
 	echo '[diracServices]'
 
-	#TODO: revise this list, try to add services
-	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	#TODO: revise this list
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
 	
 	# group proxy, will be uploaded explicitly
 	#	echo 'getting/uploading proxy for prod'
@@ -516,6 +516,33 @@ diracServices(){
 	done
 
 }
+
+#-------------------------------------------------------------------------------
+# diracAgents:
+#
+#   installs all agents on the file agents
+#
+#-------------------------------------------------------------------------------
+
+diracAgents(){
+	echo '[diracAgents]'
+
+	#TODO: revise this list
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | sed 's/System / /g' | sed 's/ /\//g'`
+	
+	for agent in $agents
+	do
+		if [[ $agent == *" JobAgent"* ]]
+		then
+			echo ''
+		else
+			echo 'calling dirac-agent' $agent -o MaxCycles=1 $DEBUG 
+			dirac-agent $agent  -o MaxCycles=1 $DEBUG
+		fi
+	done
+
+}
+
 
 
 #-------------------------------------------------------------------------------
