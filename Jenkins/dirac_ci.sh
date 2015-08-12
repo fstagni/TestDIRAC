@@ -130,6 +130,8 @@ function fullInstallDIRAC(){
 	diracDBs
 
 	#upload proxies
+	echo 'Restarting Framework ProxyManager'
+	dirac-restart-component Framework ProxyManager $DEBUG
 	diracProxies
 	
 	#fix the DBs (for the FileCatalog)
