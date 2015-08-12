@@ -528,7 +528,7 @@ diracAgents(){
 	echo '[diracAgents]'
 
 	#TODO: revise this list
-	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | sed 's/System / /g' | sed 's/ /\//g'`
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent| sed 's/System / /g' | sed 's/ /\//g'`
 	
 	for agent in $agents
 	do
