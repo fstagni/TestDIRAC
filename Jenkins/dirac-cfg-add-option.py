@@ -22,10 +22,6 @@ Script.setUsageMessage( '\n'.join( [ __doc__.split( '\n' )[1],
 Script.parseCommandLine()
 args = Script.getPositionalArgs()
 
-if len( args ) < 3:
-  Script.showHelp()
-  DIRACexit( -1 )
-#
 componentType = args[0]
 
 if len( args ) == 2:
