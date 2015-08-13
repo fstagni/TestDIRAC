@@ -528,7 +528,7 @@ diracAgents(){
 	echo '[diracAgents]'
 
 	#TODO: revise this list
-	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent| sed 's/System / /g' | sed 's/ /\//g'`
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | sed 's/System / /g' | sed 's/ /\//g'`
 	
 	for agent in $agents
 	do
@@ -537,7 +537,7 @@ diracAgents(){
 			echo ''
 		else
 			echo 'calling dirac-cfg-add-option agent' $agent
-			dirac-cfg-add-option agent $agent
+			python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-add-option.py agent $agent
 			echo 'calling dirac-agent' $agent -o MaxCycles=1 $DEBUG 
 			dirac-agent $agent  -o MaxCycles=1 $DEBUG
 		fi

@@ -149,7 +149,7 @@ function fullInstallDIRAC(){
 	#fix the services 
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-services.py $WORKSPACE $DEBUG
 	
-	#fix the SandboxStore 
+	#fix the SandboxStore and other stuff
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-server.py $WORKSPACE $DEBUG
 
 	echo 'Restarting WorkloadManagement SandboxStore'
