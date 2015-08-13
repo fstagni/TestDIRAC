@@ -1,3 +1,4 @@
+# FIXME: to bring back to life
 # TO-DO: to be took back to life, and moved to TestDIRAC
 
 import unittest, time, os
