@@ -536,6 +536,8 @@ diracAgents(){
 		then
 			echo ''
 		else
+			echo 'calling dirac-cfg-add-option agent' $agent
+			dirac-cfg-add-option agent $agent
 			echo 'calling dirac-agent' $agent -o MaxCycles=1 $DEBUG 
 			dirac-agent $agent  -o MaxCycles=1 $DEBUG
 		fi
