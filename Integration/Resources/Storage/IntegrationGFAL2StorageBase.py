@@ -18,33 +18,35 @@ respectively. If you want to test only either SRM2 or XROOT remove the other tes
 
 
 from DIRAC.Core.Base.Script import parseCommandLine
-from symbol import parameters
 parseCommandLine()
 
 import unittest
-from DIRAC import gLogger
 
+from DIRAC import gLogger
 from DIRAC.Resources.Storage.StorageElement import StorageElement
 
 class basicTest( unittest.TestCase ):
 
   def setUp( self ):
+    gLogger.setLevel( 'DEBUG' )
+
     self.storageName = 'CERN-GFAL2'
     self.tbt = None
 
 
   def testWorkflow( self ):
-    putDir = { '/lhcb/user/p/pgloor/Workflow/FolderA' : '/home/phi/dev/UnitTests/FolderA' , \
-          '/lhcb/user/p/pgloor/Workflow/FolderB' : '/home/phi/dev/UnitTests/FolderB' }
+    putDir = {'/lhcb/user/p/pgloor/Workflow/FolderA' : '/home/phi/dev/UnitTests/FolderA' ,
+              '/lhcb/user/p/pgloor/Workflow/FolderB' : '/home/phi/dev/UnitTests/FolderB' }
 
-    createDir = ['/lhcb/user/p/pgloor/Workflow/FolderA/FolderAA' , '/lhcb/user/p/pgloor/Workflow/FolderA/FolderABA', \
+    createDir = ['/lhcb/user/p/pgloor/Workflow/FolderA/FolderAA' ,
+                 '/lhcb/user/p/pgloor/Workflow/FolderA/FolderABA',
                  '/lhcb/user/p/pgloor/Workflow/FolderA/FolderAAB' ]
 
-    putFile = { '/lhcb/user/p/pgloor/Workflow/FolderA/File1' : '/home/phi/dev/UnitTests/File1' , \
-                '/lhcb/user/p/pgloor/Workflow/FolderAA/File1': '/home/phi/dev/UnitTest/File1' , \
-                '/lhcb/user/p/pgloor/Workflow/FolderBB/File2': '/home/phi/dev/UnitTest/File2' , \
-                '/lhcb/user/p/pgloor/Workflow/FolderB/File2' : '/home/phi/dev/UnitTests/File2' , \
-                '/lhcb/user/p/pgloor/Workflow/File3' : '/home/phi/dev/UnitTests/File3' }
+    putFile = {'/lhcb/user/p/pgloor/Workflow/FolderA/File1' : '/home/phi/dev/UnitTests/File1',
+               '/lhcb/user/p/pgloor/Workflow/FolderAA/File1': '/home/phi/dev/UnitTest/File1',
+               '/lhcb/user/p/pgloor/Workflow/FolderBB/File2': '/home/phi/dev/UnitTest/File2',
+               '/lhcb/user/p/pgloor/Workflow/FolderB/File2' : '/home/phi/dev/UnitTests/File2',
+               '/lhcb/user/p/pgloor/Workflow/File3' : '/home/phi/dev/UnitTests/File3' }
 
     isFile = ['/lhcb/user/p/pgloor/Workflow/FolderA/File1']
 
@@ -118,7 +120,6 @@ class XROOTTest( basicTest ):
 
 
 if __name__ == '__main__':
-  # gLogger.setLevel( 'DEBUG' )
   suite = unittest.defaultTestLoader.loadTestsFromTestCase( SRM2V2Test )
   suite.addTest( unittest.defaultTestLoader.loadTestsFromTestCase( XROOTTest ) )
   unittest.TextTestRunner( verbosity = 2 ).run( suite )

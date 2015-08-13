@@ -1,3 +1,5 @@
+# FIXME: to bring back to life
+
 from DIRAC.Core.Base import Script
 Script.parseCommandLine()
 

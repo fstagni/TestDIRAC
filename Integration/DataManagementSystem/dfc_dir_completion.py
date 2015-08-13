@@ -1,4 +1,4 @@
-# TO-DO: to be moved to TestDIRAC
+# FIXME: to bring back to life
 
 from DIRAC.Resources.Catalog.FileCatalogClient import FileCatalogClient
 
