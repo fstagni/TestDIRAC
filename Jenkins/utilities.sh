@@ -438,6 +438,9 @@ function diracUserAndGroup(){
 	dirac-admin-add-group -G prod -U adminusername,ciuser,trialUser -P Operator,FullDelegation,ProxyManagement,ServiceAdministrator,JobAdministrator,CSAdministrator,AlarmsManagement,FileCatalogManagement,SiteManager,NormalUser $DEBUG
 	
 	dirac-admin-add-shifter DataManager adminusername prod $DEBUG
+	dirac-admin-add-shifter TestManager adminusername prod $DEBUG
+	dirac-admin-add-shifter ProductionManager adminusername prod $DEBUG
+	dirac-admin-add-shifter LHCbPR adminusername prod $DEBUG
 }
 
 
@@ -528,7 +531,7 @@ diracAgents(){
 	echo '[diracAgents]'
 
 	#TODO: revise this list
-	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | grep -v DataProcessingProgressAgent | grep -v RAWIntegrityAgent  | grep -v GridSiteWMSMonitoringAgent  | grep -v HCAgent  | grep -v HCProxyAgent  | grep -v Nagios  | grep -v AncestorFiles  | grep -v BKInputData  | grep -v SAMAgent | sed 's/System / /g' | sed 's/ /\//g'`
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | grep -v DataProcessingProgressAgent | grep -v RAWIntegrityAgent  | grep -v GridSiteWMSMonitoringAgent  | grep -v GridSiteMonitoringAgent | grep -v HCAgent | grep -v GridCollectorAgent | grep -v HCProxyAgent | grep -v Nagios | grep -v AncestorFiles | grep -v BKInputData | grep -v SAMAgent | sed 's/System / /g' | sed 's/ /\//g'`
 	
 	for agent in $agents
 	do
