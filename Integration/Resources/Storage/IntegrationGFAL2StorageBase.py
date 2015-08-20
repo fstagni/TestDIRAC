@@ -24,9 +24,6 @@ import unittest
 import pdb
 
 from DIRAC import gLogger
-
-
-from DIRAC import gLogger
 from DIRAC.Resources.Storage.StorageElement import StorageElement
 
 #### GLOBAL VARIABLES: ################
@@ -56,8 +53,9 @@ LOCAL_PATH = 'UnitTests'
 class basicTest( unittest.TestCase ):
 
   def setUp( self ):
+    gLogger.setLevel( 'DEBUG' )
+
     self.storageName = STORAGE_NAME
-    #gLogger.setLevel( 'DEBUG' )
     self.tbt = None
 
   def clearDirectory( self ):
@@ -69,17 +67,17 @@ class basicTest( unittest.TestCase ):
 
   def testWorkflow( self ):
 
-    putDir = { DESTINATION_PATH + '/Workflow/FolderA' : LOCAL_PATH + '/Workflow/FolderA' , \
-          DESTINATION_PATH + '/Workflow/FolderB' : LOCAL_PATH + '/Workflow/FolderB' }
+    putDir = {DESTINATION_PATH + '/Workflow/FolderA' : LOCAL_PATH + '/Workflow/FolderA', \
+              DESTINATION_PATH + '/Workflow/FolderB' : LOCAL_PATH + '/Workflow/FolderB'}
 
-    createDir = [DESTINATION_PATH + '/Workflow/FolderA/FolderAA' , DESTINATION_PATH + '/Workflow/FolderA/FolderABA', \
+    createDir = [DESTINATION_PATH + '/Workflow/FolderA/FolderAA', DESTINATION_PATH + '/Workflow/FolderA/FolderABA', \
                  DESTINATION_PATH + '/Workflow/FolderA/FolderAAB' ]
 
-    putFile = { DESTINATION_PATH + '/Workflow/FolderA/File1' : LOCAL_PATH + '/Workflow/File1' , \
-                DESTINATION_PATH + '/Workflow/FolderAA/File1': LOCAL_PATH + '/Workflow/File1' , \
-                DESTINATION_PATH + '/Workflow/FolderBB/File2': LOCAL_PATH + '/Workflow/File2' , \
-                DESTINATION_PATH + '/Workflow/FolderB/File2' : LOCAL_PATH + '/Workflow/File2' , \
-                DESTINATION_PATH + '/Workflow/File3' : LOCAL_PATH + '/Workflow/File3' }
+    putFile = {DESTINATION_PATH + '/Workflow/FolderA/File1' : LOCAL_PATH + '/Workflow/File1', \
+               DESTINATION_PATH + '/Workflow/FolderAA/File1': LOCAL_PATH + '/Workflow/File1', \
+               DESTINATION_PATH + '/Workflow/FolderBB/File2': LOCAL_PATH + '/Workflow/File2', \
+               DESTINATION_PATH + '/Workflow/FolderB/File2' : LOCAL_PATH + '/Workflow/File2', \
+               DESTINATION_PATH + '/Workflow/File3' : LOCAL_PATH + '/Workflow/File3' }
 
     isFile = [DESTINATION_PATH + '/Workflow/FolderA/File1', DESTINATION_PATH + '/Workflow/FolderB/FileB']
 
@@ -88,7 +86,7 @@ class basicTest( unittest.TestCase ):
                DESTINATION_PATH + '/Workflow/FolderA', \
                DESTINATION_PATH + '/Workflow/FolderB']
 
-    getDir = [ DESTINATION_PATH + '/Workflow/FolderA', \
+    getDir = [DESTINATION_PATH + '/Workflow/FolderA', \
            DESTINATION_PATH + '/Workflow/FolderB']
 
     removeFile = [DESTINATION_PATH + '/Workflow/FolderA/File1']
@@ -179,5 +177,5 @@ class XROOTTest( basicTest ):
 
 if __name__ == '__main__':
   suite = unittest.defaultTestLoader.loadTestsFromTestCase( SRM2V2Test )
-  #suite.addTest( unittest.defaultTestLoader.loadTestsFromTestCase( XROOTTest ) )
+  # suite.addTest( unittest.defaultTestLoader.loadTestsFromTestCase( XROOTTest ) )
   unittest.TextTestRunner( verbosity = 2 ).run( suite )
