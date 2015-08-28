@@ -514,8 +514,8 @@ diracServices(){
 	
 	for serv in $services
 	do
-		echo 'calling dirac-install-service' $serv $DEBUG 
-		dirac-install-service $serv $DEBUG
+		echo 'calling dirac-install-component' $serv $DEBUG 
+		dirac-install-component $serv $DEBUG
 	done
 
 }
@@ -531,7 +531,7 @@ diracAgents(){
 	echo '[diracAgents]'
 
 	#TODO: revise this list
-	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v ConfigurationSystem | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | grep -v DataProcessingProgressAgent | grep -v RAWIntegrityAgent  | grep -v GridSiteWMSMonitoringAgent  | grep -v GridSiteMonitoringAgent | grep -v HCAgent | grep -v GridCollectorAgent | grep -v HCProxyAgent | grep -v Nagios | grep -v AncestorFiles | grep -v BKInputData | grep -v SAMAgent | sed 's/System / /g' | sed 's/ /\//g'`
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v CE2CSAgent.py | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | grep -v DataProcessingProgressAgent | grep -v RAWIntegrityAgent  | grep -v GridSiteWMSMonitoringAgent  | grep -v GridSiteMonitoringAgent | grep -v HCAgent | grep -v GridCollectorAgent | grep -v HCProxyAgent | grep -v Nagios | grep -v AncestorFiles | grep -v BKInputData | grep -v SAMAgent | grep -v LHCbPRProxyAgent | sed 's/System / /g' | sed 's/ /\//g'`
 	
 	for agent in $agents
 	do
