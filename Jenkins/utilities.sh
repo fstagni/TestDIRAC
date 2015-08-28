@@ -514,8 +514,8 @@ diracServices(){
 	
 	for serv in $services
 	do
-		echo 'calling dirac-install-service' $serv $DEBUG 
-		dirac-install-service $serv $DEBUG
+		echo 'calling dirac-install-component' $serv $DEBUG 
+		dirac-install-component $serv $DEBUG
 	done
 
 }
