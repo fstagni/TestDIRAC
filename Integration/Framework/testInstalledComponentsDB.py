@@ -368,6 +368,60 @@ class ComponentMonitoringClientChain( TestClientComponentMonitoring ):
                                     'Module': 'UnexistentModule2',
                                     'Type': 'UnexistentType' } )
 
+  def testHostLogging( self ):
+    """
+    Tests the HostLogging database operations
+    """
+
+    # Create a sample log
+    result = self.client.updateLog( 'TestHost', { 'DIRACVersion': 'v6r15' } )
+
+    self.assert_( result[ 'OK' ] )
+
+    # Check that the log exists
+    result = self.client.getLog( 'TestHost' )
+
+    self.assert_( result[ 'OK' ] and result[ 'Value' ][0][ 'DIRACVersion' ] == 'v6r15' )
+
+    # Update the fields of the created log
+    result = self.client.updateLog( 'TestHost' , { 'hostName': 'StillATestHost' } )
+
+    self.assert_( result[ 'OK' ] )
+
+    # Check if the log with the modified fields exists
+    result = self.client.getLog( 'StillATestHost' )
+
+    self.assert_( result[ 'OK' ] and result[ 'Value' ][0][ 'DIRACVersion' ] == 'v6r15' )
+
+    # Remove the log
+    result = self.client.removeLogs( { 'hostName': 'StillATestHost' } )
+
+    self.assert_( result[ 'OK' ] )
+
+    # Check that the log was actually removed
+    result = self.client.getLog( 'StillATestHost' )
+
+    self.assertFalse( result[ 'OK' ] )
+
+    # Multiple removal
+    self.client.updateLog( 'TestHostA', { 'DIRACVersion': 'v7r0' } )
+    self.client.updateLog( 'TestHostB', { 'DIRACVersion': 'v7r0' } )
+    self.client.updateLog( 'TestHostC', { 'DIRACVersion': 'v7r1' } )
+
+    self.client.removeLogs( { 'DIRACVersion': 'v7r0' } )
+
+    result = self.client.getLog( 'TestHostC' )
+
+    self.assert_( result[ 'OK' ] and len( result[ 'Value' ] ) >= 1 )
+
+    result = self.client.getLog( 'TestHostB' )
+
+    self.assertFalse( result[ 'OK' ] )
+
+    result = self.client.removeLogs( { 'DIRACVersion': 'v7r1' } )
+
+    self.assert_( result[ 'OK' ] )
+
 if __name__ == '__main__':
   suite = unittest.defaultTestLoader.loadTestsFromTestCase \
                                               ( TestClientComponentMonitoring )
