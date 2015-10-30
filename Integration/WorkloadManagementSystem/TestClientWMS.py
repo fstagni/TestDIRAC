@@ -166,6 +166,11 @@ class JobMonitoring( TestWMSTestCase ):
     self.assert_( res['OK'] )
     res = jobMonitor.getJobJDL( jobID, False )
     self.assert_( res['OK'] )
+    res = jobMonitor.getJobsParameters( jobID, [] )
+    self.assert_( res['OK'] )
+    self.assertEqual( res['Value'], {} )
+    res = jobMonitor.getJobsParameters( jobID, ['JobPath', 'JobSanityCheck'] )
+    self.assert_( res['OK'] )
 
     # Adding stuff
     res = jobStateUpdate.setJobStatus( jobID, 'Matched', 'matching', 'source' )
