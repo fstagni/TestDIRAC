@@ -169,7 +169,7 @@ class JobMonitoring( TestWMSTestCase ):
     res = jobMonitor.getJobsParameters( [jobID], [] )
     self.assert_( res['OK'] )
     self.assertEqual( res['Value'], {} )
-    res = jobMonitor.getJobsParameters( [jobID], ['JobPath', 'JobSanityCheck'] )
+    res = jobMonitor.getJobsParameters( [jobID], ['Owner'] )
     self.assert_( res['OK'] )
 
     # Adding stuff
