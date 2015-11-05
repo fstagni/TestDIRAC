@@ -12,7 +12,7 @@ parseCommandLine()
 
 import unittest
 
-from DIRAC.Core.Utilities.InstallTools import setMySQLPasswords
+from DIRAC.Core.Utilities.ComponentsInstaller import gComponentsInstaller
 from DIRAC.ConfigurationSystem.Client.CSAPI import CSAPI
 from DIRAC.FrameworkSystem.Client.ComponentMonitoringClient import ComponentMonitoringClient
 from DIRAC.FrameworkSystem.Client.SystemAdministratorClientCLI import SystemAdministratorClientCLI
@@ -114,7 +114,7 @@ class ComponentInstallationChain( TestComponentInstallation ):
   def testDatabase( self ):
     results = []
 
-    setMySQLPasswords( self.rootPwd, self.diracPwd )
+    gComponentsInstaller.setMySQLPasswords( self.rootPwd, self.diracPwd )
 
 
     # Install database
