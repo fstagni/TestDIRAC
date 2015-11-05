@@ -158,6 +158,9 @@ function fullInstallDIRAC(){
 	echo 'Restarting DataManagement FileCatalog'
 	dirac-restart-component DataManagement FileCatalog $DEBUG
 
+	echo 'Restarting Configuration Server'
+	dirac-restart-component Configuration Server $DEBUG
+
 	#agents
 	findAgents
 	diracAgents
