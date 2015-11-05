@@ -26,7 +26,7 @@ function findRelease(){
 
 	cd $WORKSPACE
 
-    PRE='p[[:digit:]]*'
+	PRE='p[[:digit:]]*'
 
 	if [ ! -z "$DIRACBRANCH" ]
 	then
@@ -41,27 +41,26 @@ function findRelease(){
 	wget --no-check-certificate -O releases.cfg $DIRAC_RELEASES
 
 	# Match project ( DIRAC ) version from releases.cfg
+
 	# If I don't specify a DIRACBRANCH, it will get the latest "production" release
-    
     # First, try to find if we are on a production tag
 	if [ ! -z "$DIRACBRANCH" ]
 	then
-    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
-    	
-    else
-    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | head -1 | sed 's/ //g'`
-    fi
-    #    projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]r[[:digit:]]*$PRE | head -1 | sed 's/ //g'`
+		projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
+	else
+		projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*p[[:digit:]]* | head -1 | sed 's/ //g'`
+	fi
+	# projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]r[[:digit:]]*$PRE | head -1 | sed 's/ //g'`
 	# In case there are no production tags for the branch, look for pre-releases in that branch
 	if [ ! "$projectVersion" ]
 	then
 		if [ ! -z "$DIRACBRANCH" ]
 		then
 			projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | grep $DIRACBRANCH | head -1 | sed 's/ //g'`
-	    else
-	    	projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | head -1 | sed 's/ //g'`
-	    fi
-    fi
+		else
+			projectVersion=`cat releases.cfg | grep [^:]v[[:digit:]]*r[[:digit:]]*'-pre' | head -1 | sed 's/ //g'`
+		fi
+	fi
 
 	projectVersionLine=`cat releases.cfg | grep -n $projectVersion | cut -d ':' -f 1 | head -1`
 	# start := line number after "{"  
@@ -78,9 +77,9 @@ function findRelease(){
 	cd $WORKSPACE
 	rm -r $tmp_dir
 
-    # PrintOuts
-    echo DIRAC:$projectVersion && echo $projectVersion > dirac.version
-    echo EXTERNALS:$externalsVersion && echo $externalsVersion > externals.version
+	# PrintOuts
+	echo DIRAC:$projectVersion && echo $projectVersion > dirac.version
+	echo EXTERNALS:$externalsVersion && echo $externalsVersion > externals.version
 
 }
 
@@ -93,7 +92,6 @@ function findRelease(){
 #   named systems.
 #
 #.............................................................................
-  
 function findSystems(){
 	echo '[findSystems]'
 
@@ -134,13 +132,15 @@ function findDatabases(){
 	#
 	# HACK ALERT:
 	#
-	#   We are avoiding TransferDB, which will be deprecated soon.. and FileCatalogDB for the moment
+	#   We are avoiding TransferDB, which will be deprecated soon.. 
+	#	and FileCatalogWithFkAndPsDB for the moment which is installed in other ways
+	#	and InstalledComponentsDB which is installed at the beginning
 	#
 	if [ ! -z "$DBstoExclude" ]
 	then 
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep -v $DBstoExclude | sort | uniq > databases
 	else
-		find *DIRAC -name *DB.sql | grep -vE '(TransferDB.sql|FileCatalogWithFkAndPsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
+		find *DIRAC -name *DB.sql | grep -vE '(FileCatalogDB|FileCatalogWithFkAndPsDB|InstalledComponentsDB)' | awk -F "/" '{print $2,$4}' | grep $DBstoSearch | sort | uniq > databases
 	fi
 
 	echo found `wc -l databases`
@@ -181,6 +181,34 @@ findServices(){
 	fi
 
 	echo found `wc -l services`
+}
+
+findAgents(){
+	echo '[findAgents]'
+
+
+	if [ ! -z "$1" ]
+	then
+		ServicestoSearch=$1
+		if [ "$AgentstoSearch" = "exclude" ]
+		then
+			echo 'excluding ' $2
+			AgentstoExclude=$2
+			AgentstoSearch=' '
+		fi
+	else
+		AgentstoExclude='notExcluding'
+	fi
+
+	cd $WORKSPACE
+	if [ ! -z "$AgentstoExclude" ]
+	then 
+		find *DIRAC/*/Agent/ -name *Agent.py | grep -v test | awk -F "/" '{print $2,$4}' | grep -v $AgentstoExclude | sort | uniq > agents
+	else
+		find *DIRAC/*/Agent/ -name *Agent.py | grep -v test | awk -F "/" '{print $2,$4}' | grep $AgentstoSearch | sort | uniq > agents
+	fi
+
+	echo found `wc -l agents`
 }
 
 
@@ -277,9 +305,14 @@ function diracInstall(){
 
 	wget --no-check-certificate -O dirac-install $DIRAC_INSTALL
 	chmod +x dirac-install
-	./dirac-install -r `cat dirac.version` -t server $DEBUG
+	
+	diracInstallCommand
 }
 
+#This is what VOs may replace
+function diracInstallCommand(){
+	./dirac-install -r `cat dirac.version` -t server $DEBUG
+}
 
 
 
@@ -399,11 +432,15 @@ function diracCredentials(){
 function diracUserAndGroup(){
 	echo '[diracUserAndGroup]'
 	
-	dirac-admin-add-user -N ciuser -D /C=ch/O=DIRAC/OU=DIRAC CI/CN=ciuser/emailAddress=trialUser@cern.ch -M lhcb-dirac-ci@cern.ch -G user $DEBUG
-	dirac-admin-add-user -N trialUser -D /C=ch/O=DIRAC/OU=DIRAC CI/CN=trialUser/emailAddress=trialUser@cern.ch -M trialUser@cern.ch -G user $DEBUG
+	dirac-admin-add-user -N ciuser -D /C=ch/O=DIRAC/OU=DIRAC\ CI/CN=ciuser/emailAddress=lhcb-dirac-ci@cern.ch -M lhcb-dirac-ci@cern.ch -G user $DEBUG
+	dirac-admin-add-user -N trialUser -D /C=ch/O=DIRAC/OU=DIRAC\ CI/CN=trialUser/emailAddress=lhcb-dirac-ci@cern.ch -M lhcb-dirac-ci@cern.ch -G user $DEBUG
 	
 	dirac-admin-add-group -G prod -U adminusername,ciuser,trialUser -P Operator,FullDelegation,ProxyManagement,ServiceAdministrator,JobAdministrator,CSAdministrator,AlarmsManagement,FileCatalogManagement,SiteManager,NormalUser $DEBUG
-
+	
+	dirac-admin-add-shifter DataManager adminusername prod $DEBUG
+	dirac-admin-add-shifter TestManager adminusername prod $DEBUG
+	dirac-admin-add-shifter ProductionManager adminusername prod $DEBUG
+	dirac-admin-add-shifter LHCbPR adminusername prod $DEBUG
 }
 
 
@@ -468,15 +505,49 @@ function diracAddSite(){
 diracServices(){
 	echo '[diracServices]'
 
-	#TODO: revise this list, try to add services
-	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v FileCatalog  | grep -v FileCatalogProxy | grep -v FTSManager | grep -v LcgFileCatalogProxy | grep -v MigrationMonitoring | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v RequestManager | grep -v RequestProxy  | grep -v TransferDBMonitoring | grep -v SiteProxy | grep -v SiteMap | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	#TODO: revise this list
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	
+	# group proxy, will be uploaded explicitly
+	#	echo 'getting/uploading proxy for prod'
+	#	dirac-proxy-init -U -g prod -C $WORKSPACE/user/client.pem -K $WORKSPACE/user/client.key $DEBUG
+	
 	for serv in $services
 	do
-		echo 'calling dirac-install-service' $serv $DEBUG 
-		dirac-install-service $serv $DEBUG
+		echo 'calling dirac-install-component' $serv $DEBUG 
+		dirac-install-component $serv $DEBUG
 	done
 
 }
+
+#-------------------------------------------------------------------------------
+# diracAgents:
+#
+#   installs all agents on the file agents
+#
+#-------------------------------------------------------------------------------
+
+diracAgents(){
+	echo '[diracAgents]'
+
+	#TODO: revise this list
+	agents=`cat agents | cut -d '.' -f 1 | grep -v LFC | grep -v MyProxy | grep -v CAUpdate | grep -v CE2CSAgent.py | grep -v FrameworkSystem | grep -v DiracSiteAgent | grep -v StatesMonitoringAgent | grep -v DataProcessingProgressAgent | grep -v RAWIntegrityAgent  | grep -v GridSiteWMSMonitoringAgent  | grep -v GridSiteMonitoringAgent | grep -v HCAgent | grep -v GridCollectorAgent | grep -v HCProxyAgent | grep -v Nagios | grep -v AncestorFiles | grep -v BKInputData | grep -v SAMAgent | grep -v LHCbPRProxyAgent | sed 's/System / /g' | sed 's/ /\//g'`
+	
+	for agent in $agents
+	do
+		if [[ $agent == *" JobAgent"* ]]
+		then
+			echo ''
+		else
+			echo 'calling dirac-cfg-add-option agent' $agent
+			python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-add-option.py agent $agent
+			echo 'calling dirac-agent' $agent -o MaxCycles=1 $DEBUG 
+			dirac-agent $agent  -o MaxCycles=1 $DEBUG
+		fi
+	done
+
+}
+
 
 
 #-------------------------------------------------------------------------------
@@ -487,9 +558,9 @@ diracServices(){
 #-------------------------------------------------------------------------------
 
 diracDBs(){
-	echo '[dumpDBs]'
+	echo '[diracDBs]'
 
-	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB`
+	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB | grep -v ^InstalledComponentsDB`
 	for db in $dbs
 	do
 		dirac-install-db $db $DEBUG
@@ -497,11 +568,22 @@ diracDBs(){
 
 }
 
+# Drop, then Install manually the DFC
+diracDFCDB(){
+	echo '[diracDFCDB]'
+	
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS FileCatalogDB;"
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT  < $WORKSPACE/DIRAC/DataManagementSystem/DB/FileCatalogWithFkAndPsDB.sql
+}
+
+# drop DBs
+
 dropDBs(){
 	echo '[dropDBs]'
 	
-	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB`
+	dbs=`cat databases | cut -d ' ' -f 2 | cut -d '.' -f 1 | grep -v ^RequestDB | grep -v ^FileCatalogDB`
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-drop-db.py $dbs $DEBUG
+
 }
 
 
@@ -522,8 +604,8 @@ dropDBs(){
   #
   #.............................................................................
 
-  function killRunsv(){
-    echo '[killRunsv]'
+function killRunsv(){
+	echo '[killRunsv]'
 
     # Bear in mind that we run with 'errexit' mode. This call, if finds nothing
     # will return an error, which will make the whole script exit. However, if 
@@ -560,19 +642,18 @@ dropDBs(){
   #
   #.............................................................................
 
-  function stopRunsv(){
-    echo '[stopRunsv]'
+function stopRunsv(){
+	echo '[stopRunsv]'
 
-    # Let's try to be a bit more delicated than the function above
+	# Let's try to be a bit more delicated than the function above
 
-    source $WORKSPACE/bashrc
-    runsvctrl d $WORKSPACE/startup/*
-    runsvstat $WORKSPACE/startup/*
-    
-    # If does not work, let's kill it.
-    killRunsv
-   
-  }
+	source $WORKSPACE/bashrc
+	runsvctrl d $WORKSPACE/startup/*
+	runsvstat $WORKSPACE/startup/*
+	
+	# If does not work, let's kill it.
+	killRunsv
+}
 
 
   #.............................................................................
@@ -583,7 +664,7 @@ dropDBs(){
   #
   #.............................................................................
 
-  function startRunsv(){
+function startRunsv(){
     echo '[startRunsv]'
     
     # Let's try to be a bit more delicated than the function above
@@ -600,5 +681,50 @@ dropDBs(){
     
     runsvstat $WORKSPACE/startup/*
    
-  }
+}
 
+
+
+
+############################################ 
+# Pilot tests Utilities
+
+
+function getCertificate(){
+	echo '[getCertificate]'
+	# just gets a host certificate from a known location 
+	
+	mkdir -p $WORKSPACE/etc/grid-security/
+	cp /root/hostcert.pem $WORKSPACE/etc/grid-security/
+	cp /root/hostkey.pem $WORKSPACE/etc/grid-security/ 
+	chmod 0600 $WORKSPACE/etc/grid-security/hostkey.pem
+
+} 
+
+function prepareForPilot(){
+	
+	#cert first (host certificate)
+	#getCertificate (no need...)
+	
+	#get the necessary scripts
+	wget --no-check-certificate -O dirac-install.py $DIRAC_INSTALL
+	wget --no-check-certificate -O dirac-pilot.py $DIRAC_PILOT
+	wget --no-check-certificate -O pilotTools.py $DIRAC_PILOT_TOOLS
+	wget --no-check-certificate -O pilotCommands.py $DIRAC_PILOT_COMMANDS
+
+}
+
+
+#.............................................................................
+#
+# downloadProxy:
+#
+#   dowloads a proxy from the ProxyManager (a real one - which is probably the certification one) into a file
+#
+#.............................................................................
+
+function downloadProxy(){
+	echo '[downloadProxy]'
+	
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-proxy-download.py $DIRACUSERDN -R $DIRACUSERROLE -o /DIRAC/Security/UseServerCertificate=True $PILOTCFG $DEBUG
+}
