@@ -170,7 +170,11 @@ function fullInstallDIRAC(){
 
 
 function clean(){
-	#stopping services
+	
+	#Uninstalling the services
+	diracUninstallServices
+
+	#stopping runsv of services and agents
 	stopRunsv
 	
 	#DBs

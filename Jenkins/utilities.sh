@@ -498,7 +498,7 @@ function diracAddSite(){
 #-------------------------------------------------------------------------------
 # diracServices:
 #
-#   installs all services on the file services
+#   installs all services
 #
 #-------------------------------------------------------------------------------
 
@@ -519,6 +519,32 @@ diracServices(){
 	done
 
 }
+
+#-------------------------------------------------------------------------------
+# diracUninstallServices:
+#
+#   uninstalls all services
+#
+#-------------------------------------------------------------------------------
+
+diracUninstallServices(){
+	echo '[diracUninstallServices]'
+
+	#TODO: revise this list
+	services=`cat services | cut -d '.' -f 1 | grep -v Bookkeeping | grep -v ^ConfigurationSystem | grep -v LcgFileCatalogProxy | grep -v Plotting | grep -v RAWIntegrity | grep -v RunDBInterface | grep -v ComponentMonitoring | sed 's/System / /g' | sed 's/Handler//g' | sed 's/ /\//g'`
+	
+	# group proxy, will be uploaded explicitly
+	#	echo 'getting/uploading proxy for prod'
+	#	dirac-proxy-init -U -g prod -C $WORKSPACE/user/client.pem -K $WORKSPACE/user/client.key $DEBUG
+	
+	for serv in $services
+	do
+		echo 'calling dirac-uninstall-component' $serv $DEBUG 
+		dirac-uninstall-component $serv $DEBUG
+	done
+
+}
+
 
 #-------------------------------------------------------------------------------
 # diracAgents:
