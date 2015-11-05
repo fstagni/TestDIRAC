@@ -54,7 +54,13 @@ function installSite(){
 	#Fixing install.cfg file
 	cp $(eval echo $INSTALL_CFG_FILE) .
 	sed -i s/VAR_Release/$projectVersion/g $WORKSPACE/DIRAC/install.cfg
-	sed -i s/VAR_LcgVer/$externalsVersion/g $WORKSPACE/DIRAC/install.cfg
+	if [ ! -z "$LcgVer" ]
+	then
+		echo 'Fixing LcgVer to ' $LcgVer
+		sed -i s/VAR_LcgVer/$LcgVer/g $WORKSPACE/DIRAC/install.cfg
+	else
+		sed -i s/VAR_LcgVer/$externalsVersion/g $WORKSPACE/DIRAC/install.cfg
+	fi
 	sed -i s,VAR_TargetPath,$WORKSPACE,g $WORKSPACE/DIRAC/install.cfg
 	fqdn=`hostname --fqdn`
 	sed -i s,VAR_HostDN,$fqdn,g $WORKSPACE/DIRAC/install.cfg
@@ -85,73 +91,97 @@ function fullInstallDIRAC(){
 	echo '[fullInstallDIRAC]'
 	
 	finalCleanup
-	
+
 	if [ ! -z "$DEBUG" ]
 	then
 		echo 'Running in DEBUG mode'
 		export DEBUG='-ddd'
 	fi  
-	
-	#basic install, with only the CS running 
+
+	#basic install, with only the CS (and ComponentMonitoring) running, together with DB InstalledComponentsDB, which is needed) 
 	installSite
-	
+
 	#replace the sources with custom ones if defined
 	diracReplace
-	
+
 	#Dealing with security stuff
 	generateUserCredentials
 	diracCredentials
-	
+
 	#just add a site
 	diracAddSite
-	
+
 	#Install the Framework
 	findDatabases 'FrameworkSystem'
 	dropDBs
 	diracDBs
 	findServices 'FrameworkSystem'
 	diracServices
-	
+
 	#create groups
 	diracUserAndGroup
+
+	echo 'Restarting Framework ProxyManager'
+	dirac-restart-component Framework ProxyManager $DEBUG
 	
+	echo 'Restarting Framework ComponentMonitoring'
+	dirac-restart-component Framework ComponentMonitoring $DEBUG
+
 	#Now all the rest	
-	
+
 	#DBs (not looking for FrameworkSystem ones, already installed)
 	#findDatabases 'exclude' 'FrameworkSystem'
 	findDatabases 'exclude' 'FrameworkSystem'
 	dropDBs
 	diracDBs
+
+	#upload proxies
+	diracProxies
+	
+	#fix the DBs (for the FileCatalog)
+	diracDFCDB
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-dbs.py $WORKSPACE $DEBUG
 	
 	#services (not looking for FrameworkSystem already installed)
-	#findServices 'exclude' 'FrameworkSystem'
 	findServices 'exclude' 'FrameworkSystem'
 	diracServices
 
-	#fix the SandboxStore 
+	#fix the services 
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-services.py $WORKSPACE $DEBUG
+	
+	#fix the SandboxStore and other stuff
 	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update-server.py $WORKSPACE $DEBUG
-	#refresh the configuration (gConfig dark side!)
-	sleep 10
-	diracRefreshCS
-	sleep 10
-	echo 'Restarting Configuration Server'
-	dirac-restart-component Configuration Server $DEBUG
-	sleep 30
+
 	echo 'Restarting WorkloadManagement SandboxStore'
 	dirac-restart-component WorkloadManagement SandboxStore $DEBUG
 
-	#refresh the configuration (gConfig dark side!)
-	sleep 10
-	diracRefreshCS
-	sleep 10
-	
-	#upload proxies
-	diracProxies
-	# prod
+	echo 'Restarting DataManagement FileCatalog'
+	dirac-restart-component DataManagement FileCatalog $DEBUG
+
+	echo 'Restarting Configuration Server'
+	dirac-restart-component Configuration Server $DEBUG
+
+	#agents
+	findAgents
+	diracAgents
+
+
 }
 
 
-
+function clean(){
+	#stopping services
+	stopRunsv
+	
+	#DBs
+	findDatabases
+	dropDBs
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS FileCatalogDB;"
+	mysql -u$DB_ROOTUSER -p$DB_ROOTPWD -h$DB_HOST -P$DB_PORT -e "DROP DATABASE IF EXISTS InstalledComponentsDB;"
+	
+	#clean all
+	finalCleanup
+}
 
 ############################################
 # Pilot
@@ -171,37 +201,36 @@ function DIRACPilotInstall(){
 	prepareForPilot
 	
 	#run the dirac-pilot script, the JobAgent won't necessarily match a job
-	#FIXME: using LHCb-Certification here, and LHCb CS! 
 
 	findRelease
  
-	python dirac-pilot.py -S LHCb-Certification -r $projectVersion -C dips://lbvobox18.cern.ch:9135/Configuration/Server -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ $DEBUG
+	#Don't launch the JobAgent here
+	python dirac-pilot.py -S $DIRACSETUP -r $projectVersion -C $CSURL -N jenkins.cern.ch -Q jenkins-queue_not_important -n DIRAC.Jenkins.ch -M 1 --cert --certLocation=/home/dirac/certs/ -X GetPilotVersion,CheckWorkerNode,InstallDIRAC,ConfigureBasics,ConfigureSite,ConfigureArchitecture,ConfigureCPURequirements $DEBUG
 }
 
-############################################ 
-# Utilities
 
-
-function getCertificate(){
-	echo '[getCertificate]'
-	# just gets a host certificate from a known location 
+function fullPilot(){
 	
-	mkdir -p $WORKSPACE/etc/grid-security/
-	cp /root/hostcert.pem $WORKSPACE/etc/grid-security/
-	cp /root/hostkey.pem $WORKSPACE/etc/grid-security/ 
-	chmod 0600 $WORKSPACE/etc/grid-security/hostkey.pem
+	if [ ! -z "$DEBUG" ]
+	then
+		echo 'Running in DEBUG mode'
+		export DEBUG='-ddd'
+	fi  
 
-} 
+	#first simply install via the pilot
+	DIRACPilotInstall
 
-function prepareForPilot(){
+	#this should have been created, we source it so that we can continue
+	source bashrc
 	
-	#cert first (host certificate)
-	#getCertificate (no need...)
+	#Adding the LocalSE and the CPUTimeLeft, for the subsequent tests
+	dirac-configure -FDMH --UseServerCertificate -L $DIRACSE $DEBUG
 	
-	#get the necessary scripts
-	wget --no-check-certificate -O dirac-install.py $DIRAC_INSTALL
-	wget --no-check-certificate -O dirac-pilot.py $DIRAC_PILOT
-	wget --no-check-certificate -O pilotTools.py $DIRAC_PILOT_TOOLS
-	wget --no-check-certificate -O pilotCommands.py $DIRAC_PILOT_COMMANDS
-
+	#Configure for CPUTimeLeft and more
+	python $WORKSPACE/TestDIRAC/Jenkins/dirac-cfg-update.py -V $VO -S $DIRACSETUP -o /DIRAC/Security/UseServerCertificate=True $DEBUG
+	
+	#Getting a user proxy, so that we can run jobs
+	downloadProxy
+	#Set not to use the server certificate for running the jobs 
+	dirac-configure -FDMH -o /DIRAC/Security/UseServerCertificate=False $DEBUG
 }
