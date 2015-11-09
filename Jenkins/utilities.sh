@@ -540,7 +540,7 @@ diracUninstallServices(){
 	for serv in $services
 	do
 		echo 'calling dirac-uninstall-component' $serv $DEBUG 
-		dirac-uninstall-component $serv $DEBUG
+		dirac-uninstall-component -f $serv $DEBUG
 	done
 
 }
