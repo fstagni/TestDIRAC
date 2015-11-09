@@ -68,10 +68,18 @@ class ComponentInstallationChain( TestComponentInstallation ):
 
   def testComponent( self ):
 
-    # Install component
-    self.client.do_install( 'service Framework Notification' )
-    self.csClient.downloadCSData()
+    service1Present = False
+    service2Present = False
 
+    # Check whether the service is already present or not
+    cfg = self.csClient.getCurrentCFG()[ 'Value' ]
+    if cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ):
+      service1Present = True
+
+    if not service1Present:
+      # Install component
+      self.client.do_install( 'service Framework Notification' )
+      self.csClient.downloadCSData()
 
     # Check installation in CS
     cfg = self.csClient.getCurrentCFG()[ 'Value' ]
@@ -80,40 +88,54 @@ class ComponentInstallationChain( TestComponentInstallation ):
     self.assert_( cfg.getOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ) == 'dips://' + self.host + ':' + str( self.notificationPort ) + '/Framework/Notification' )
 
     # Check installation in database
-    result = self.monitoringClient.getInstallations( { 'Instance': 'Notification', 'UnInstallationTime': None, 'InstalledBy': self.user },
+    if not service1Present:
+      result = self.monitoringClient.getInstallations( { 'Instance': 'Notification', 'UnInstallationTime': None, 'InstalledBy': self.user },
+                                                      { 'System': 'Framework', 'Type': 'service', 'Module': 'Notification' },
+                                                      {}, False )
+    else:
+      # We dont know who made the previous installation
+      result = self.monitoringClient.getInstallations( { 'Instance': 'Notification', 'UnInstallationTime': None },
                                                       { 'System': 'Framework', 'Type': 'service', 'Module': 'Notification' },
                                                       {}, False )
 
     self.assert_( result[ 'OK' ] and len( result[ 'Value' ] ) == 1 )
 
-    # Install second component
-    self.client.do_install( 'service Framework Notification2 -m Notification' )
+    # Check whether the second service is already present or not
+    cfg = self.csClient.getCurrentCFG()[ 'Value' ]
+    if cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification2' ):
+      service2Present = True
+
+    if not service2Present:
+      # Install second component
+      self.client.do_install( 'service Framework Notification2 -m Notification' )
 
     # Check installation in CS
     self.csClient.downloadCSData()
     cfg = self.csClient.getCurrentCFG()[ 'Value' ]
-    self.assert_( cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and not cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification2' ) )
+    self.assert_( cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification2' ) )
 
-    # Uninstall component
-    self.client.do_uninstall( '-f Framework Notification' )
+    if not service1Present:
+      # Uninstall component
+      self.client.do_uninstall( '-f Framework Notification' )
 
-    # Check CS is intact ( there is still one instance of Notification )
+    # Check CS is intact ( there should still be at least one instance of Notification )
     self.csClient.downloadCSData()
     cfg = self.csClient.getCurrentCFG()[ 'Value' ]
     self.assert_( cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ) )
 
-    # Uninstall component
-    self.client.do_uninstall( '-f Framework Notification2' )
+    if not service2Present:
+      # Uninstall second component
+      self.client.do_uninstall( '-f Framework Notification2' )
 
-    # Check uninstallation in CS
-    self.csClient.downloadCSData()
-    cfg = self.csClient.getCurrentCFG()[ 'Value' ]
-    self.assert_( not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and not cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ) )
+    if not service1Present and not service2Present:
+      # Check uninstallation in CS ( only if the services were not already present )
+      self.csClient.downloadCSData()
+      cfg = self.csClient.getCurrentCFG()[ 'Value' ]
+      self.assert_( not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification/' ) and not cfg.isSection( 'Systems/Framework/' + self.frameworkSetup + '/Services/Notification2/' ) and not cfg.isOption( 'Systems/Framework/' + self.frameworkSetup + '/URLs/Notification' ) )
 
   def testDatabase( self ):
 
     setMySQLPasswords( self.rootPwd, self.diracPwd )
-
 
     # Install database
     self.client.do_install( 'db FTSDB' )
