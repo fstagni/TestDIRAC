@@ -43,7 +43,7 @@ class FTSDBTestCase( unittest.TestCase ):
     self.opIDs = []
 
     self.ftsJobs = []
-    for i in range( self.numberOfJobs ):
+    for i in xrange( self.numberOfJobs ):
 
       opID = i % 3
       if opID not in self.opIDs:

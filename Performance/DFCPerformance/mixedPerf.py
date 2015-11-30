@@ -63,9 +63,9 @@ done = False
 
 def generatePath(depth, withLetters = False):
   # Between 0 and 3 because in generate we have 4 subdirs per dir. Adapt :-)
-  rndTab = [random.randint( 0, 3 ) for _i in range( depth ) ]
+  rndTab = [random.randint( 0, 3 ) for _i in xrange( depth ) ]
   if withLetters:
-    rndLetters = [random.choice( string.letters ) for _i in range( 3 ) ]
+    rndLetters = [random.choice( string.letters ) for _i in xrange( 3 ) ]
     rndTab += rndLetters
   dirPath = '/' + '/'.join(map(str, rndTab))
   return dirPath
@@ -102,7 +102,7 @@ def doInsert(depth, maxFile):
   dirPath = generatePath(depth, True)
   nbOfFiles = random.randint(1,maxFile)
   lfnDict = {}  
-  for f in range(nbOfFiles):
+  for f in xrange(nbOfFiles):
     filename = "%s.txt"%(f)
     lfn = "%s/%s"%(dirPath, filename)
     size = random.randint(1,1000)

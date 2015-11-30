@@ -944,8 +944,8 @@ if __name__ == '__main__':
 
   for setup in all_combinations:
     print "Running with:"
-    print ( "".join( ["\t %s : %s\n" % ( managerTypes[i], setup[i] ) for i in range( numberOfManager )] ) )
-    for i in range( numberOfManager ):
+    print ( "".join( ["\t %s : %s\n" % ( managerTypes[i], setup[i] ) for i in xrange( numberOfManager )] ) )
+    for i in xrange( numberOfManager ):
       DATABASE_CONFIG[managerTypes[i]] = setup[i]
 
 

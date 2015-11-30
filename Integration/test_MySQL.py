@@ -30,7 +30,7 @@ class MyDB( MySQL ):
     return DIRAC.S_OK()
 
   def filltable( self, entries ):
-    for i in range( 1, entries + 1 ):
+    for i in xrange( 1, entries + 1 ):
       retDict = self._insert( 'MyDB_testTable',
                               inFields = [ 'Status' ],
                               inValues = [ i ] )
@@ -38,7 +38,7 @@ class MyDB( MySQL ):
     return DIRAC.S_OK( i )
 
   def listtable( self, entries ):
-    for i in range( 1, entries + 1 ):
+    for i in xrange( 1, entries + 1 ):
       retDict = self._getFields( 'MyDB_testTable', [],
                                  inFields = [ 'Status' ],
                                  inValues = [ i ] )

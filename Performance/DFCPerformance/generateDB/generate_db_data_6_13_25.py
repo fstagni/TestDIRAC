@@ -93,7 +93,7 @@ def loop ( index, cur, parentId ):
 
   if index >= len (d):
     return
-  for i in range(d[index]):
+  for i in xrange(d[index]):
     uid = random.randint(1, len(config.users) )
     gid = random.randint(1, len(config.groups) )
     next = cur + [i]
@@ -113,7 +113,7 @@ def loop ( index, cur, parentId ):
 
     #generate files
     if nbFiles:
-      for f in range(nbFiles):
+      for f in xrange(nbFiles):
         filename = "%s.txt"%(f)
         size = random.randint(1,1000)
         statusid = 2

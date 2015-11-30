@@ -42,7 +42,7 @@ class TestClientFTS3(unittest.TestCase):
     op.username = "Pink"
     op.userGroup = "Floyd"
     op.sourceSEs = sources
-    for _i in range(nbFiles*len(dests)):
+    for _i in xrange(nbFiles*len(dests)):
       self.fileCounter += 1
       for dest in dests:
         ftsFile = FTS3File()
@@ -223,7 +223,7 @@ class TestClientFTS3(unittest.TestCase):
     listOfIds = []
 
     persistStart = time.time()
-    for i in range( 1000 ):
+    for i in xrange( 1000 ):
       op = self.generateOperation( 'Transfer', i % 20 + 1, ['Dest1'] )
       res = db.persistOperation( op )
       self.assert_( res['OK'] )
