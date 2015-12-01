@@ -167,7 +167,7 @@ class ReqClientMix( ReqClientTestCase ):
     db = RequestDB()
 
     reqIDs = []
-    for i in range( self.stressRequests ):
+    for i in xrange( self.stressRequests ):
       request = Request( { "RequestName": "test-%d" % i } )
       op = Operation( { "Type": "RemoveReplica", "TargetSE": "CERN-USER" } )
       op += File( { "LFN": "/lhcb/user/c/cibak/foo" } )
@@ -199,7 +199,7 @@ class ReqClientMix( ReqClientTestCase ):
     db = RequestDB()
 
     reqIDs = []
-    for i in range( self.stressRequests ):
+    for i in xrange( self.stressRequests ):
       request = Request( { "RequestName": "test-%d" % i } )
       op = Operation( { "Type": "RemoveReplica", "TargetSE": "CERN-USER" } )
       op += File( { "LFN": "/lhcb/user/c/cibak/foo" } )
@@ -213,7 +213,7 @@ class ReqClientMix( ReqClientTestCase ):
 
     startTime = time.time()
 
-    for i in range( loops ):
+    for i in xrange( loops ):
       get = db.getBulkRequests( self.bulkRequest, True )
       if "Message" in get:
         print get["Message"]
