@@ -1,5 +1,4 @@
  #!/bin/bash
-echo $PWD 
 SCRIPT_PATH="mpTest.py"
 PYTHON="/usr/bin/python"
 
